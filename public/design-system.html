@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Design System — Perps Trading</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f5f5f5;
+      color: #020203;
+      padding: 48px;
+    }
+
+    /* ── Page title ── */
+    .page-title {
+      font-size: 32px;
+      font-weight: 700;
+      line-height: 40px;
+      margin-bottom: 8px;
+    }
+    .page-subtitle {
+      font-size: 14px;
+      color: #8d8e8e;
+      margin-bottom: 64px;
+    }
+
+    /* ── Section ── */
+    .section { margin-bottom: 64px; }
+    .section-title {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #8d8e8e;
+      margin-bottom: 24px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    /* ── COLOR ── */
+    .color-group { margin-bottom: 32px; }
+    .color-group-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #626363;
+      margin-bottom: 12px;
+    }
+    .color-row { display: flex; flex-wrap: wrap; gap: 16px; }
+    .color-swatch {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 120px;
+    }
+    .color-rect {
+      width: 120px;
+      height: 80px;
+      border-radius: 8px;
+      border: 1px solid rgba(0,0,0,0.06);
+    }
+    .color-name { font-size: 12px; font-weight: 600; color: #020203; }
+    .color-hex  { font-size: 11px; color: #8d8e8e; font-family: monospace; }
+
+    /* ── TYPOGRAPHY ── */
+    .type-row {
+      display: flex;
+      align-items: baseline;
+      gap: 24px;
+      padding: 16px 0;
+      border-bottom: 1px solid #f2f2f2;
+    }
+    .type-meta {
+      width: 180px;
+      flex-shrink: 0;
+    }
+    .type-label  { font-size: 11px; font-weight: 600; color: #8d8e8e; }
+    .type-spec   { font-size: 11px; color: #626363; margin-top: 2px; font-family: monospace; }
+    .type-sample { flex: 1; }
+
+    /* ── SPACING ── */
+    .spacing-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 10px 0;
+      border-bottom: 1px solid #f2f2f2;
+    }
+    .spacing-bar-wrap { width: 200px; }
+    .spacing-bar { background: #0a68f4; height: 8px; border-radius: 2px; }
+    .spacing-label { font-size: 12px; font-weight: 600; width: 40px; }
+    .spacing-desc  { font-size: 12px; color: #8d8e8e; }
+
+    /* ── RADIUS ── */
+    .radius-row { display: flex; flex-wrap: wrap; gap: 24px; }
+    .radius-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    .radius-box {
+      width: 80px;
+      height: 80px;
+      background: #0a68f4;
+      opacity: 0.15;
+      border: 2px solid #0a68f4;
+    }
+    .radius-label { font-size: 12px; font-weight: 600; }
+    .radius-sub   { font-size: 11px; color: #8d8e8e; }
+
+    /* ── SHADOW ── */
+    .shadow-row { display: flex; gap: 32px; flex-wrap: wrap; }
+    .shadow-item {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .shadow-box {
+      width: 120px;
+      height: 80px;
+      background: white;
+      border-radius: 8px;
+    }
+    .shadow-label { font-size: 12px; font-weight: 600; }
+    .shadow-val   { font-size: 11px; color: #8d8e8e; font-family: monospace; max-width: 200px; }
+
+    /* ── COMPONENTS ── */
+    .component-grid { display: flex; flex-wrap: wrap; gap: 48px; }
+    .component-block { display: flex; flex-direction: column; gap: 12px; }
+    .component-block-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #8d8e8e;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .component-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+    }
+    .btn-primary { background: #0a68f4; color: white; border-radius: 8px; height: 44px; padding: 0 24px; font-size: 14px; }
+    .btn-long    { background: #25a764; color: white; border-radius: 8px; height: 52px; padding: 0 20px; font-size: 14px; min-width: 120px; flex-direction: column; gap: 2px; }
+    .btn-short   { background: #e54040; color: white; border-radius: 8px; height: 52px; padding: 0 20px; font-size: 14px; min-width: 120px; flex-direction: column; gap: 2px; }
+    .btn-sub     { font-size: 10px; font-weight: 400; opacity: 0.9; }
+    .btn-secondary { background: white; color: #020203; border: 1px solid rgba(2,2,3,0.15); border-radius: 4px; height: 44px; padding: 0 16px; font-size: 14px; }
+    .btn-preset   { background: white; color: #020203; border: 1px solid rgba(2,2,3,0.15); border-radius: 999px; height: 32px; padding: 0 16px; font-size: 12px; }
+
+    /* ── Badges ── */
+    .badge { display: inline-flex; padding: 2px 4px; border-radius: 2px; font-size: 10px; font-weight: 600; line-height: 14px; }
+    .badge-long  { background: #e6f4ea; color: #25a764; }
+    .badge-short { background: #fde8e8; color: #e54040; }
+    .badge-lev   { background: #f2f2f2; color: #8d8e8e; }
+
+    /* ── Inputs ── */
+    .input-row { display: flex; flex-direction: column; gap: 6px; }
+    .input-label { font-size: 12px; color: #626363; }
+    .input-field {
+      border: 1px solid rgba(2,2,3,0.15);
+      border-radius: 6px;
+      background: white;
+      padding: 8px 12px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      color: #020203;
+      outline: none;
+      width: 200px;
+    }
+
+    /* ── Position Card ── */
+    .position-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0px 0px 28px 0px rgba(0,0,0,0.06);
+      padding: 16px;
+      width: 343px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .card-header { display: flex; justify-content: space-between; align-items: center; }
+    .card-header-left { display: flex; align-items: center; gap: 4px; }
+    .btc-icon { width: 16px; height: 16px; border-radius: 50%; background: #F78B1A; display: flex; align-items: center; justify-content: center; color: white; font-size: 8px; font-weight: bold; }
+    .pnl-box { background: #e6f4ea; border-radius: 8px; padding: 12px 16px; text-align: center; }
+    .pnl-amount { font-size: 28px; line-height: 34px; color: #25a764; }
+    .pnl-roi    { font-size: 12px; font-weight: 600; color: #25a764; }
+    .stat-row   { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #f2f2f2; font-size: 12px; }
+    .stat-label { color: #626363; }
+    .stat-val   { font-weight: 600; color: #020203; }
+
+    /* ── Bottom Nav ── */
+    .bottom-nav {
+      background: rgba(255,255,255,0.96);
+      border-top: 1px solid rgba(2,2,3,0.1);
+      display: flex;
+      padding: 8px 0 0;
+      width: 375px;
+      border-radius: 0 0 8px 8px;
+    }
+    .nav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 0 4px 8px;
+      font-size: 10px;
+      color: #8d8e8e;
+    }
+    .nav-item.active { color: #020203; font-weight: 600; }
+    .nav-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+
+    /* ── Tooltip ── */
+    .coachmark-card {
+      background: white;
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: 0px 4px 20px rgba(0,0,0,0.15);
+      width: 280px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .coachmark-title { font-size: 14px; font-weight: 600; }
+    .coachmark-body  { font-size: 12px; line-height: 16px; color: #020203; }
+    .coachmark-arrow { display: flex; justify-content: center; }
+
+    /* ── Icon grid ── */
+    .icon-grid { display: flex; flex-wrap: wrap; gap: 24px; }
+    .icon-item  { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    .icon-box   { width: 48px; height: 48px; background: white; border-radius: 8px; border: 1px solid #f2f2f2; display: flex; align-items: center; justify-content: center; }
+    .icon-name  { font-size: 10px; color: #8d8e8e; text-align: center; }
+  </style>
+</head>
+<body>
+
+  <h1 class="page-title">Perps Trading — Design System</h1>
+  <p class="page-subtitle">Tokens, typography, components, and patterns for the perpetuals trading UI.</p>
+
+  <!-- ═══════════════════════════════════════════ COLORS ══ -->
+  <div class="section">
+    <div class="section-title">Color System</div>
+
+    <div class="color-group">
+      <div class="color-group-label">Brand / Semantic</div>
+      <div class="color-row">
+        <div class="color-swatch">
+          <div class="color-rect" style="background:#0a68f4;"></div>
+          <div class="color-name">Primary / CTA</div>
+          <div class="color-hex">#0a68f4</div>
+        </div>
+        <div class="color-swatch">
+          <div class="color-rect" style="background:#25a764;"></div>
+          <div class="color-name">Success / Long</div>
+          <div class="color-hex">#25a764</div>
+        </div>
+        <div class="color-swatch">
+          <div class="color-rect" style="background:#e54040;"></div>
+          <div class="color-name">Error / Short</div>
+          <div class="color-hex">#e54040</div>
+        </div>
+        <div class="color-swatch">
+          <div class="color-rect" style="background:#F78B1A;"></div>
+          <div class="color-name">Accent / BTC</div>
+          <div class="color-hex">#F78B1A</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="color-group">
+      <div class="color-group-label">Ink / Text</div>
+      <div class="color-row">
+        <div class="color-swatch">
+          <div class="color-rect" style="background:#020203;"></div>
+          <div class="color-name">Ink Primary</div>
+          <div class="color-hex">#020203</div>
+        </div>
+        <div class="color-swatch">
+          <div class="color-rect" style="background:#626363;"></div>
+          <div class="color-name">Ink Secondary</div>
+          <div class="color-hex">#626363</div>
+        </div>
+        <div class="color-swatch">
+          <div class="color-rect" style="background:#8d8e8e;"></div>
+          <div class="color-name">Ink Tertiary</div>
+          <div class="color-hex">#8d8e8e</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="color-group">
+      <div class="color-group-label">Surface / Background</div>
+      <div class="color-row">
+        <div class="color-swatch">
+          <div class="color-rect" style="background:#ffffff; border:1px solid #e0e0e0;"></div>
+          <div class="color-name">White</div>
+          <div class="color-hex">#ffffff</div>
+        </div>
+        <div class="color-swatch">
+          <div class="color-rect" style="background:#fafafa; border:1px solid #e0e0e0;"></div>
+          <div class="color-name">Surface</div>
+          <div class="color-hex">#fafafa</div>
+        </div>
+        <div class="color-swatch">
+          <div class="color-rect" style="background:#f2f2f2;"></div>
+          <div class="color-name">Divider</div>
+          <div class="color-hex">#f2f2f2</div>
+        </div>
+        <div class="color-swatch">
+          <div class="color-rect" style="background:#e6f4ea;"></div>
+          <div class="color-name">Success BG</div>
+          <div class="color-hex">#e6f4ea</div>
+        </div>
+        <div class="color-swatch">
+          <div class="color-rect" style="background:#fde8e8;"></div>
+          <div class="color-name">Error BG</div>
+          <div class="color-hex">#fde8e8</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="color-group">
+      <div class="color-group-label">Overlay / Transparency</div>
+      <div class="color-row">
+        <div class="color-swatch">
+          <div class="color-rect" style="background:rgba(2,2,3,0.10);"></div>
+          <div class="color-name">Ink/10</div>
+          <div class="color-hex">rgba(2,2,3,0.10)</div>
+        </div>
+        <div class="color-swatch">
+          <div class="color-rect" style="background:rgba(2,2,3,0.15);"></div>
+          <div class="color-name">Ink/15</div>
+          <div class="color-hex">rgba(2,2,3,0.15)</div>
+        </div>
+        <div class="color-swatch">
+          <div class="color-rect" style="background:rgba(0,0,0,0.60);"></div>
+          <div class="color-name">Scrim/60</div>
+          <div class="color-hex">rgba(0,0,0,0.60)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ TYPOGRAPHY ══ -->
+  <div class="section">
+    <div class="section-title">Typography</div>
+
+    <div class="type-row">
+      <div class="type-meta">
+        <div class="type-label">Display / 36</div>
+        <div class="type-spec">Neue Haas · 36px / 44px · 400</div>
+      </div>
+      <div class="type-sample" style="font-size:36px;line-height:44px;font-weight:400;">70.488,5</div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta">
+        <div class="type-label">Display / 28</div>
+        <div class="type-spec">Neue Haas · 28px / 34px · 400</div>
+      </div>
+      <div class="type-sample" style="font-size:28px;line-height:34px;font-weight:400;">+1,511.50</div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta">
+        <div class="type-label">Display / 20</div>
+        <div class="type-spec">Neue Haas · 20px / 24px · 400</div>
+      </div>
+      <div class="type-sample" style="font-size:20px;line-height:24px;font-weight:400;">70,488.50</div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta">
+        <div class="type-label">Heading / 16</div>
+        <div class="type-spec">Inter · 16px / 22px · 600</div>
+      </div>
+      <div class="type-sample" style="font-size:16px;line-height:22px;font-weight:600;">Open Positions</div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta">
+        <div class="type-label">Body / 14 Semi</div>
+        <div class="type-spec">Inter · 14px / 20px · 600</div>
+      </div>
+      <div class="type-sample" style="font-size:14px;line-height:20px;font-weight:600;">↗ Long  ↘ Short</div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta">
+        <div class="type-label">Body / 14</div>
+        <div class="type-spec">Inter · 14px / 20px · 400</div>
+      </div>
+      <div class="type-sample" style="font-size:14px;line-height:20px;font-weight:400;">Profit when price goes up</div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta">
+        <div class="type-label">Caption / 12 Semi</div>
+        <div class="type-spec">Inter · 12px / 16px · 600</div>
+      </div>
+      <div class="type-sample" style="font-size:12px;line-height:16px;font-weight:600;">Starting Price (USDT)</div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta">
+        <div class="type-label">Caption / 12</div>
+        <div class="type-spec">Inter · 12px / 16px · 400</div>
+      </div>
+      <div class="type-sample" style="font-size:12px;line-height:16px;font-weight:400;">Not a financial recommendation.</div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta">
+        <div class="type-label">Micro / 10 Semi</div>
+        <div class="type-spec">Inter · 10px / 14px · 600</div>
+      </div>
+      <div class="type-sample" style="font-size:10px;line-height:14px;font-weight:600;">FUNDING / COUNTDOWN</div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta">
+        <div class="type-label">Micro / 10</div>
+        <div class="type-spec">Inter · 10px / 14px · 400</div>
+      </div>
+      <div class="type-sample" style="font-size:10px;line-height:14px;font-weight:400;">-0.0063% / 01:49:08</div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta">
+        <div class="type-label">Nano / 8</div>
+        <div class="type-spec">Inter · 8px / 14px · 400</div>
+      </div>
+      <div class="type-sample" style="font-size:8px;line-height:14px;font-weight:400;">12:15 · 12:30 · 12:45 · 13:00</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ SPACING ══ -->
+  <div class="section">
+    <div class="section-title">Spacing Scale</div>
+
+    <div class="spacing-row">
+      <div class="spacing-label">2px</div>
+      <div class="spacing-bar-wrap"><div class="spacing-bar" style="width:4px;"></div></div>
+      <div class="spacing-desc">Tight — between badge elements, micro gaps</div>
+    </div>
+    <div class="spacing-row">
+      <div class="spacing-label">4px</div>
+      <div class="spacing-bar-wrap"><div class="spacing-bar" style="width:8px;"></div></div>
+      <div class="spacing-desc">XS — icon-to-label, badge padding</div>
+    </div>
+    <div class="spacing-row">
+      <div class="spacing-label">6px</div>
+      <div class="spacing-bar-wrap"><div class="spacing-bar" style="width:12px;"></div></div>
+      <div class="spacing-desc">XS+ — status bar icon gap</div>
+    </div>
+    <div class="spacing-row">
+      <div class="spacing-label">8px</div>
+      <div class="spacing-bar-wrap"><div class="spacing-bar" style="width:16px;"></div></div>
+      <div class="spacing-desc">SM — standard gap, nav padding</div>
+    </div>
+    <div class="spacing-row">
+      <div class="spacing-label">12px</div>
+      <div class="spacing-bar-wrap"><div class="spacing-bar" style="width:24px;"></div></div>
+      <div class="spacing-desc">MD — card inner padding, medium gap</div>
+    </div>
+    <div class="spacing-row">
+      <div class="spacing-label">16px</div>
+      <div class="spacing-bar-wrap"><div class="spacing-bar" style="width:32px;"></div></div>
+      <div class="spacing-desc">LG — screen horizontal margin, section gap</div>
+    </div>
+    <div class="spacing-row">
+      <div class="spacing-label">24px</div>
+      <div class="spacing-bar-wrap"><div class="spacing-bar" style="width:48px;"></div></div>
+      <div class="spacing-desc">XL — button horizontal padding</div>
+    </div>
+    <div class="spacing-row">
+      <div class="spacing-label">32px</div>
+      <div class="spacing-bar-wrap"><div class="spacing-bar" style="width:64px;"></div></div>
+      <div class="spacing-desc">2XL — empty state vertical padding</div>
+    </div>
+    <div class="spacing-row">
+      <div class="spacing-label">48px</div>
+      <div class="spacing-bar-wrap"><div class="spacing-bar" style="width:96px;"></div></div>
+      <div class="spacing-desc">3XL — section spacing</div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════ BORDER RADIUS ══ -->
+  <div class="section">
+    <div class="section-title">Border Radius</div>
+    <div class="radius-row">
+      <div class="radius-item">
+        <div class="radius-box" style="border-radius:2px;"></div>
+        <div class="radius-label">2px</div>
+        <div class="radius-sub">Badges, chips</div>
+      </div>
+      <div class="radius-item">
+        <div class="radius-box" style="border-radius:4px;"></div>
+        <div class="radius-label">4px</div>
+        <div class="radius-sub">Secondary buttons</div>
+      </div>
+      <div class="radius-item">
+        <div class="radius-box" style="border-radius:6px;"></div>
+        <div class="radius-label">6px</div>
+        <div class="radius-sub">Inputs, form fields</div>
+      </div>
+      <div class="radius-item">
+        <div class="radius-box" style="border-radius:8px;"></div>
+        <div class="radius-label">8px</div>
+        <div class="radius-sub">Buttons, sheets, modals</div>
+      </div>
+      <div class="radius-item">
+        <div class="radius-box" style="border-radius:10px;"></div>
+        <div class="radius-label">10px</div>
+        <div class="radius-sub">Info surface cards</div>
+      </div>
+      <div class="radius-item">
+        <div class="radius-box" style="border-radius:16px;"></div>
+        <div class="radius-label">16px</div>
+        <div class="radius-sub">Position card</div>
+      </div>
+      <div class="radius-item">
+        <div class="radius-box" style="border-radius:999px; width:80px; height:32px; margin-top:24px;"></div>
+        <div class="radius-label">Full</div>
+        <div class="radius-sub">Pills, toggles, avatars</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ SHADOWS ══ -->
+  <div class="section">
+    <div class="section-title">Elevation / Shadows</div>
+    <div class="shadow-row">
+      <div class="shadow-item">
+        <div class="shadow-box" style="box-shadow:0px 0px 28px 0px rgba(0,0,0,0.06);"></div>
+        <div class="shadow-label">Card — Elevation 1</div>
+        <div class="shadow-val">0px 0px 28px 0px rgba(0,0,0,0.06)</div>
+      </div>
+      <div class="shadow-item">
+        <div class="shadow-box" style="box-shadow:0px 4px 20px rgba(0,0,0,0.15);"></div>
+        <div class="shadow-label">Tooltip — Elevation 2</div>
+        <div class="shadow-val">0px 4px 20px rgba(0,0,0,0.15)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════ COMPONENTS ══ -->
+  <div class="section">
+    <div class="section-title">Components</div>
+
+    <div class="component-grid">
+
+      <!-- Buttons -->
+      <div class="component-block">
+        <div class="component-block-label">Buttons</div>
+        <div class="component-row">
+          <button class="btn btn-primary">Open Long BTC</button>
+          <button class="btn btn-secondary">Close Position</button>
+        </div>
+        <div class="component-row">
+          <button class="btn btn-long">
+            <span>↗ Long</span>
+            <span class="btn-sub">Profit when price goes up</span>
+          </button>
+          <button class="btn btn-short">
+            <span>↘ Short</span>
+            <span class="btn-sub">Profit when price goes down</span>
+          </button>
+        </div>
+        <div class="component-row">
+          <button class="btn btn-preset">25%</button>
+          <button class="btn btn-preset">50%</button>
+          <button class="btn btn-preset">75%</button>
+          <button class="btn btn-preset">100%</button>
+        </div>
+      </div>
+
+      <!-- Badges -->
+      <div class="component-block">
+        <div class="component-block-label">Badges</div>
+        <div class="component-row">
+          <span class="badge badge-long">Long</span>
+          <span class="badge badge-short">Short</span>
+          <span class="badge badge-lev">25x</span>
+        </div>
+      </div>
+
+      <!-- Input -->
+      <div class="component-block">
+        <div class="component-block-label">Input Field</div>
+        <div class="input-row">
+          <label class="input-label">Amount (USDT)</label>
+          <input class="input-field" type="text" value="20" />
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Position Card -->
+    <div style="margin-top:48px;">
+      <div class="component-block-label" style="font-size:11px;font-weight:600;color:#8d8e8e;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:16px;">Position Card</div>
+      <div class="position-card">
+        <div class="card-header">
+          <div class="card-header-left">
+            <div class="btc-icon">₿</div>
+            <span style="font-size:14px;font-weight:600;">Bitcoin</span>
+            <span class="badge badge-long">Long</span>
+            <span class="badge badge-lev">25x</span>
+          </div>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M10 2l4 4-4 4V8c-4 0-6 1-7 4 0-4 2-8 7-8V2z" stroke="#020203" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+
+        <div>
+          <div style="font-size:12px;color:#626363;text-align:center;margin-bottom:8px;">Unrealized P&amp;L</div>
+          <div class="pnl-box">
+            <div class="pnl-amount">+USDT 1,511.50</div>
+            <div class="pnl-roi">ROI +214.8%</div>
+          </div>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;">
+          <div>
+            <div style="font-size:12px;color:#626363;">Starting Price (USDT)</div>
+            <div style="font-size:20px;line-height:24px;">70,488.50</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:12px;color:#626363;">Current Price (USDT)</div>
+            <div style="font-size:20px;line-height:24px;">72,000.00</div>
+          </div>
+        </div>
+
+        <div>
+          <div class="stat-row"><span class="stat-label">Est. Liq. Price</span><span class="stat-val">65,248</span></div>
+          <div class="stat-row"><span class="stat-label">Locked Margin</span><span class="stat-val">USDT 300.00</span></div>
+          <div class="stat-row"><span class="stat-label">TP / SL</span><span class="stat-val" style="color:#25a764;">75,000 <span style="color:#8d8e8e;">/</span> <span style="color:#020203;">65,000</span></span></div>
+        </div>
+
+        <div style="display:flex;gap:16px;">
+          <button class="btn btn-secondary" style="flex:none;width:108px;height:44px;">Set TP/SL</button>
+          <button class="btn btn-secondary" style="flex:1;height:44px;">Close Position</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div style="margin-top:48px;">
+      <div class="component-block-label" style="font-size:11px;font-weight:600;color:#8d8e8e;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:16px;">Bottom Navigation</div>
+      <div class="bottom-nav">
+        <div class="nav-item">
+          <div class="nav-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z" stroke="#8d8e8e" stroke-width="1.5" stroke-linejoin="round"/><path d="M9 21V12h6v9" stroke="#8d8e8e" stroke-width="1.5" stroke-linejoin="round"/></svg>
+          </div>
+          Home
+        </div>
+        <div class="nav-item">
+          <div class="nav-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M3 17l5-5 4 4 5-6 4 3" stroke="#8d8e8e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          Market
+        </div>
+        <div class="nav-item">
+          <div class="nav-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#8d8e8e" stroke-width="1.5"/><path d="M12 8v4l3 3" stroke="#8d8e8e" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </div>
+          Trade
+        </div>
+        <div class="nav-item active">
+          <div class="nav-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="8" height="8" rx="1" stroke="#020203" stroke-width="1.5"/><rect x="13" y="3" width="8" height="8" rx="1" stroke="#020203" stroke-width="1.5"/><rect x="3" y="13" width="8" height="8" rx="1" stroke="#020203" stroke-width="1.5"/><rect x="13" y="13" width="8" height="8" rx="1" fill="#020203" stroke="#020203" stroke-width="1.5"/></svg>
+          </div>
+          Futures
+        </div>
+        <div class="nav-item">
+          <div class="nav-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="2" y="6" width="20" height="14" rx="2" stroke="#8d8e8e" stroke-width="1.5"/><path d="M16 13a1 1 0 110 2 1 1 0 010-2z" fill="#8d8e8e"/><path d="M6 6V5a2 2 0 012-2h8a2 2 0 012 2v1" stroke="#8d8e8e" stroke-width="1.5"/></svg>
+          </div>
+          Wallet
+        </div>
+      </div>
+    </div>
+
+    <!-- Coachmark -->
+    <div style="margin-top:48px;">
+      <div class="component-block-label" style="font-size:11px;font-weight:600;color:#8d8e8e;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:16px;">Coachmark Tooltip</div>
+      <div class="coachmark-card">
+        <div>
+          <div class="coachmark-title">Track your floating profit/loss</div>
+          <div class="coachmark-body" style="margin-top:8px;">See your ROI in real-time based on the difference between your entry price and the current market price, amplified by your leverage.</div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;">
+          <button class="btn btn-primary" style="height:36px;padding:0 24px;font-size:14px;">Next</button>
+        </div>
+      </div>
+      <div class="coachmark-arrow">
+        <svg width="13" height="11" viewBox="0 0 13 11" fill="#020203" opacity="0.15"><path d="M6.5 11L0 0h13L6.5 11z"/></svg>
+      </div>
+    </div>
+
+    <!-- Icons -->
+    <div style="margin-top:48px;">
+      <div class="component-block-label" style="font-size:11px;font-weight:600;color:#8d8e8e;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:16px;">Icon Set (24px)</div>
+      <div class="icon-grid">
+        <div class="icon-item">
+          <div class="icon-box">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z" stroke="#020203" stroke-width="1.5" stroke-linejoin="round"/><path d="M9 21V12h6v9" stroke="#020203" stroke-width="1.5" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="icon-name">Home</div>
+        </div>
+        <div class="icon-item">
+          <div class="icon-box">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M3 17l5-5 4 4 5-6 4 3" stroke="#020203" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="icon-name">Market</div>
+        </div>
+        <div class="icon-item">
+          <div class="icon-box">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#020203" stroke-width="1.5"/><path d="M12 8v4l3 3" stroke="#020203" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </div>
+          <div class="icon-name">Trade</div>
+        </div>
+        <div class="icon-item">
+          <div class="icon-box">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="8" height="8" rx="1" stroke="#020203" stroke-width="1.5"/><rect x="13" y="3" width="8" height="8" rx="1" stroke="#020203" stroke-width="1.5"/><rect x="3" y="13" width="8" height="8" rx="1" stroke="#020203" stroke-width="1.5"/><rect x="13" y="13" width="8" height="8" rx="1" fill="#020203" stroke="#020203" stroke-width="1.5"/></svg>
+          </div>
+          <div class="icon-name">Futures</div>
+        </div>
+        <div class="icon-item">
+          <div class="icon-box">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="2" y="6" width="20" height="14" rx="2" stroke="#020203" stroke-width="1.5"/><path d="M16 13a1 1 0 110 2 1 1 0 010-2z" fill="#020203"/><path d="M6 6V5a2 2 0 012-2h8a2 2 0 012 2v1" stroke="#020203" stroke-width="1.5"/></svg>
+          </div>
+          <div class="icon-name">Wallet</div>
+        </div>
+        <div class="icon-item">
+          <div class="icon-box">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 5h14M3 10h14M3 15h14" stroke="#020203" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </div>
+          <div class="icon-name">Menu</div>
+        </div>
+        <div class="icon-item">
+          <div class="icon-box">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="#F78B1A"><path d="M10 2l2.39 4.84 5.35.78-3.87 3.77.91 5.32L10 14.27l-4.78 2.44.91-5.32L2.26 7.62l5.35-.78L10 2z"/></svg>
+          </div>
+          <div class="icon-name">Favorite</div>
+        </div>
+        <div class="icon-item">
+          <div class="icon-box">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="5" r="1.25" fill="#020203"/><circle cx="10" cy="10" r="1.25" fill="#020203"/><circle cx="10" cy="15" r="1.25" fill="#020203"/></svg>
+          </div>
+          <div class="icon-name">More</div>
+        </div>
+        <div class="icon-item">
+          <div class="icon-box">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 2l4 4-4 4V8c-4 0-6 1-7 4 0-4 2-8 7-8V2z" stroke="#020203" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="icon-name">Share</div>
+        </div>
+        <div class="icon-item">
+          <div class="icon-box">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#020203" stroke-width="1.2"/><path d="M7 6.5v3.5M7 4.5v.5" stroke="#020203" stroke-width="1.2" stroke-linecap="round"/></svg>
+          </div>
+          <div class="icon-name">Info</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+</body>
+</html>
