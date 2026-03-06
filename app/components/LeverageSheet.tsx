@@ -5,8 +5,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 const MIN = 1;
 const MAX = 25;
 const ALL_TICKS = Array.from({ length: MAX - MIN + 1 }, (_, i) => i + MIN);
-const LABELED = new Set([1, 5, 10, 15, 20, 25]);
-const TICK_SPACING = 28; // px between tick centers
+
+// Each tick column is 8px wide, gaps between them are 28px → center-to-center = 36px
+const TICK_W = 8;
+const TICK_GAP = 28;
+const TICK_STEP = TICK_W + TICK_GAP; // 36px center-to-center
 
 interface LeverageSheetProps {
   initialLeverage?: number;
@@ -14,6 +17,12 @@ interface LeverageSheetProps {
   entryPrice?: number;
   onConfirm: (leverage: number) => void;
   onClose: () => void;
+}
+
+function formatEuropean(n: number): string {
+  if (!isFinite(n) || n === 0) return "—";
+  const [int, dec] = n.toFixed(1).split(".");
+  return `${parseInt(int).toLocaleString("de-DE")},${dec}`;
 }
 
 export default function LeverageSheet({
@@ -25,16 +34,13 @@ export default function LeverageSheet({
 }: LeverageSheetProps) {
   const [leverage, setLeverage] = useState(initialLeverage);
   const [animating, setAnimating] = useState(false);
-  const [pulseTick, setPulseTick] = useState<number | null>(null);
 
-  // The outer container (measures available width)
   const containerRef = useRef<HTMLDivElement>(null);
-  // Drag tracking
   const isDragging = useRef(false);
   const dragStartX = useRef(0);
   const dragStartLev = useRef(initialLeverage);
-  // Store containerWidth once measured
   const containerWidth = useRef(343);
+  const [dragging, setDragging] = useState(false);
 
   const leverageRef = useRef(leverage);
   leverageRef.current = leverage;
@@ -45,9 +51,9 @@ export default function LeverageSheet({
     }
   }, []);
 
-  const haptic = useCallback((strong = false) => {
+  const haptic = useCallback(() => {
     if (typeof navigator !== "undefined" && "vibrate" in navigator) {
-      navigator.vibrate(strong ? [8, 4, 8] : 6);
+      navigator.vibrate(6);
     }
   }, []);
 
@@ -57,26 +63,23 @@ export default function LeverageSheet({
       if (clamped === leverageRef.current && fromDrag) return;
       leverageRef.current = clamped;
       setLeverage(clamped);
-      haptic(fromDrag ? false : true);
+      haptic();
       setAnimating(true);
       setTimeout(() => setAnimating(false), 120);
-      setPulseTick(clamped);
-      setTimeout(() => setPulseTick(null), 300);
     },
     [haptic]
   );
 
-  // The selected tick stays pinned at the center of the container.
-  // translateX moves the ruler left/right so tick[leverage-MIN] is at center.
-  // center of container = containerWidth / 2
-  // position of selected tick in ruler = (leverage - MIN) * TICK_SPACING
-  // offset = center - tickPos  →  ruler shifts so that tick lands at center
-  const tickOffset = (lev: number) =>
-    containerWidth.current / 2 - (lev - MIN) * TICK_SPACING;
+  // Translate the ruler so the selected tick aligns to the horizontal center.
+  // Tick index = leverage - MIN (0-based).
+  // Center of tick[i] in ruler coords = i * TICK_STEP + TICK_W / 2
+  // We want that center at containerWidth / 2:
+  // offset = containerWidth/2 - (index * TICK_STEP + TICK_W/2)
+  const tickOffset = (lev: number) => {
+    const idx = lev - MIN;
+    return containerWidth.current / 2 - (idx * TICK_STEP + TICK_W / 2);
+  };
 
-  const [dragging, setDragging] = useState(false);
-
-  // ── Pointer drag ──────────────────────────────────────────────
   const onPointerDown = useCallback((e: React.PointerEvent) => {
     isDragging.current = true;
     setDragging(true);
@@ -89,11 +92,10 @@ export default function LeverageSheet({
   const onPointerMove = useCallback(
     (e: React.PointerEvent) => {
       if (!isDragging.current) return;
-      // Dragging LEFT increases leverage (ticks scroll left = higher values come to center)
+      // Dragging LEFT → ruler moves left → higher values scroll into center
       const dx = dragStartX.current - e.clientX;
-      const deltaSteps = dx / TICK_SPACING;
-      const newLev = dragStartLev.current + deltaSteps;
-      changeLeverage(newLev, true);
+      const deltaSteps = dx / TICK_STEP;
+      changeLeverage(dragStartLev.current + deltaSteps, true);
     },
     [changeLeverage]
   );
@@ -103,11 +105,14 @@ export default function LeverageSheet({
     setDragging(false);
   }, []);
 
-  // Liquidation price estimate
   const positionSize = margin * leverage;
-  const liqPrice = leverage >= 2 ? entryPrice * (1 - 1 / leverage) * 1.02 : 0;
+
+  const liqPrice =
+    leverage >= 2 && entryPrice > 0
+      ? entryPrice * (1 - 1 / leverage)
+      : 0;
   const liqPct =
-    liqPrice > 0
+    liqPrice > 0 && entryPrice > 0
       ? (((liqPrice - entryPrice) / entryPrice) * 100).toFixed(1)
       : null;
 
@@ -116,22 +121,27 @@ export default function LeverageSheet({
   return (
     <div className="bg-white w-[375px] rounded-t-[8px] pt-[8px] pb-0 flex flex-col gap-[24px] items-center">
       {/* Drag handle */}
-      <div className="w-[40px] h-[4px] rounded-full bg-[#8d8e8e]" />
+      <div className="bg-[#8d8e8e] h-[4px] rounded-full w-[40px]" />
 
       {/* Title + description */}
       <div className="flex flex-col gap-[8px] items-center px-[16px] w-full text-center">
-        <span className="font-['Neue_Haas_Grotesk_Display_Pro',sans-serif] text-[20px] leading-[24px] text-[#020203] w-[343px]">
+        <span
+          className="text-[20px] leading-[24px] text-[#020203] w-[343px]"
+          style={{ fontFamily: "'Neue Haas Grotesk Display Pro', sans-serif", fontWeight: 500 }}
+        >
           Leverage
         </span>
         <span className="font-['Inter',sans-serif] text-[12px] leading-[16px] text-[#020203]">
-          Multiply your investment power.
+          Multiply the amount you&apos;re investing.
           <br />
-          Higher leverage gives you higher return but also higher risk
+          Higher leverage gives you higher return but with higher risk.
         </span>
       </div>
 
-      {/* Min / Value / Max row */}
-      <div className="flex gap-[8px] items-center justify-center w-[343px]">
+      {/* Min / Value / Max + Slider — grouped tightly */}
+      <div className="flex flex-col gap-[2px] items-center w-full">
+        {/* Min / Value / Max row */}
+        <div className="flex gap-[8px] items-center justify-center w-[343px]">
         <button
           onClick={() => changeLeverage(MIN)}
           className="flex-1 h-[44px] bg-[#f2f2f2] rounded-[8px] flex items-center justify-center hover:bg-[#e8e8e8] active:scale-95 transition-all"
@@ -143,8 +153,10 @@ export default function LeverageSheet({
 
         <div className="flex-1 flex items-center justify-center">
           <span
-            className="font-['Neue_Haas_Grotesk_Display_Pro',sans-serif] text-[36px] leading-[44px] text-[#020203] text-center select-none"
+            className="text-[36px] leading-[44px] text-[#020203] text-center select-none"
             style={{
+              fontFamily: "'Neue Haas Grotesk Display Pro', sans-serif",
+              fontWeight: 500,
               display: "inline-block",
               transition: "transform 0.1s ease, opacity 0.1s ease",
               transform: animating ? "scale(1.12)" : "scale(1)",
@@ -165,22 +177,23 @@ export default function LeverageSheet({
         </button>
       </div>
 
-      {/* ── Ruler ─────────────────────────────────────────────── */}
+      {/* ── Ruler / Slider ───────────────────────────────────────── */}
       <div
         ref={containerRef}
         className="w-[343px] relative overflow-hidden select-none"
-        style={{ height: 72, cursor: "grab" }}
+        style={{ height: 72, cursor: dragging ? "grabbing" : "grab" }}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
       >
 
-        {/* Sliding tick ruler */}
+
+        {/* Sliding tick ruler — positioned at the bottom of the container */}
         <div
-          className="absolute top-0 bottom-0 flex items-end"
+          className="absolute bottom-0 left-0 flex items-end"
           style={{
-            // No transition during drag, smooth snap otherwise
+            gap: TICK_GAP,
             transition: dragging ? "none" : "transform 0.15s ease",
             transform: `translateX(${offset}px)`,
             willChange: "transform",
@@ -188,35 +201,29 @@ export default function LeverageSheet({
         >
           {ALL_TICKS.map((tick) => {
             const isSelected = tick === leverage;
-            const isLabeled = LABELED.has(tick);
-            const isPulsing = pulseTick === tick;
-            const tickH = isSelected ? 52 : isLabeled ? 32 : 20;
-            const tickW = isSelected ? 3 : 1.5;
-            const tickColor =
-              tick < leverage
-                ? "#020203"
-                : isSelected
-                ? "#020203"
-                : "#d0d0d0";
+            const isPast = tick < leverage;
+            const isActive = isSelected || isPast;
+
+            const tickColor = isActive ? "#020203" : "#8d8e8e";
+            const labelColor = isActive ? "#020203" : "#8d8e8e";
+            // Selected: tall bar; past: medium; future: short
+            const tickH = isSelected ? 52 : isActive ? 18 : 12;
 
             return (
               <div
                 key={tick}
-                className="flex flex-col items-center justify-end"
-                style={{ width: TICK_SPACING, height: "100%", flexShrink: 0 }}
+                className="flex flex-col items-center"
+                style={{ width: TICK_W, flexShrink: 0 }}
                 onClick={() => changeLeverage(tick)}
               >
-                {/* Number label */}
+                {/* Number label — hidden for selected tick */}
                 <span
-                  className="font-['Inter',sans-serif] mb-[5px]"
+                  className="font-['Inter',sans-serif] text-[10px] leading-[12px]"
                   style={{
-                    fontSize: isSelected ? 12 : 11,
-                    lineHeight: "14px",
-                    fontWeight: isSelected ? 700 : 400,
-                    color: isLabeled ? (isSelected ? "#020203" : "#8d8e8e") : "transparent",
-                    transition: "transform 0.15s ease, color 0.1s",
-                    transform: isPulsing ? "scale(1.25)" : "scale(1)",
-                    display: "inline-block",
+                    color: labelColor,
+                    whiteSpace: "nowrap",
+                    visibility: isSelected ? "hidden" : "visible",
+                    transition: "color 0.1s",
                   }}
                 >
                   {tick}
@@ -224,13 +231,12 @@ export default function LeverageSheet({
                 {/* Tick bar */}
                 <div
                   style={{
-                    width: tickW,
+                    width: isSelected ? 2 : 1,
                     height: tickH,
                     background: tickColor,
-                    borderRadius: tickW,
-                    transition: "height 0.15s ease, width 0.1s ease, background 0.1s",
-                    transform: isPulsing ? "scaleY(1.18)" : "scaleY(1)",
-                    transformOrigin: "bottom",
+                    borderRadius: 2,
+                    transition: "height 0.12s ease, background 0.1s",
+                    marginTop: 2,
                   }}
                 />
               </div>
@@ -238,52 +244,64 @@ export default function LeverageSheet({
           })}
         </div>
       </div>
+      {/* end Min/Max + Slider group */}
+      </div>
 
-      {/* Info card */}
-      <div className="bg-[#fafafa] rounded-[10px] p-[12px] flex flex-col gap-[10px] w-[343px]">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-[4px]">
+      {/* Info cards */}
+      <div className="flex flex-col gap-[8px] items-start w-[343px]">
+        {/* Card 1: Investment + Leverage + divider + Position Size */}
+        <div className="bg-[#fafafa] rounded-[10px] p-[12px] flex flex-col gap-[10px] w-full">
+          <div className="flex items-center justify-between">
+            <span className="font-['Inter',sans-serif] text-[12px] leading-[16px] text-[#8d8e8e]">
+              Investment
+            </span>
+            <span className="font-['Inter',sans-serif] text-[12px] leading-[16px] text-[#020203]">
+              USDT {margin > 0 ? Math.round(margin).toLocaleString("en-US") : "—"}
+            </span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="font-['Inter',sans-serif] text-[12px] leading-[16px] text-[#8d8e8e]">
+              Leverage
+            </span>
+            <span className="font-['Inter',sans-serif] text-[12px] leading-[16px] text-[#020203]">
+              x {leverage}
+            </span>
+          </div>
+          <div className="h-px bg-[rgba(2,2,3,0.1)] w-full" />
+          <div className="flex items-center justify-between">
             <span className="font-['Inter',sans-serif] text-[12px] leading-[16px] text-[#8d8e8e]">
               Position Size
             </span>
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <circle cx="7" cy="7" r="6" stroke="#8d8e8e" strokeWidth="1.2" />
-              <path d="M7 6.5v3.5M7 4.5v.5" stroke="#8d8e8e" strokeWidth="1.2" strokeLinecap="round" />
-            </svg>
-          </div>
-          <span className="font-['Inter',sans-serif] text-[12px] leading-[16px] text-[#020203]">
-            USDT {positionSize.toLocaleString("en-US")}
-          </span>
-        </div>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-[4px]">
-            <span className="font-['Inter',sans-serif] text-[12px] leading-[16px] text-[#8d8e8e]">
-              Est. Liq. Price
+            <span className="font-['Inter',sans-serif] text-[12px] leading-[16px] text-[#020203]">
+              USDT {positionSize > 0 ? Math.round(positionSize).toLocaleString("en-US") : "—"}
             </span>
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <circle cx="7" cy="7" r="6" stroke="#8d8e8e" strokeWidth="1.2" />
-              <path d="M7 6.5v3.5M7 4.5v.5" stroke="#8d8e8e" strokeWidth="1.2" strokeLinecap="round" />
-            </svg>
           </div>
-          <span className="font-['Inter',sans-serif] text-[12px] leading-[16px] text-[#020203]">
-            {liqPrice > 0
-              ? `USDT ${liqPrice.toLocaleString("en-US", { maximumFractionDigits: 1 })} (${liqPct}%)`
-              : "—"}
-          </span>
+        </div>
+
+        {/* Card 2: Est. Liquidation Price */}
+        <div className="bg-[#fafafa] rounded-[10px] p-[12px] flex flex-col w-full">
+          <div className="flex items-center justify-between">
+            <span className="font-['Inter',sans-serif] text-[12px] leading-[16px] text-[#8d8e8e]">
+              Est. Liquidation Price
+            </span>
+            <span className="font-['Inter',sans-serif] text-[12px] leading-[16px] text-[#020203]">
+              {liqPrice > 0
+                ? `USDT ${formatEuropean(liqPrice)} (${liqPct}%)`
+                : "—"}
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* Confirm */}
-      <div className="w-[343px]">
-        <button
-          onClick={() => { onConfirm(leverage); onClose(); }}
-          className="w-full h-[44px] bg-[#0a68f4] rounded-[8px] flex items-center justify-center hover:opacity-90 active:opacity-80 transition-opacity"
-        >
-          <span className="font-['Inter',sans-serif] font-semibold text-[14px] leading-[20px] text-white">
-            Confirm
-          </span>
-        </button>
-      </div>
+      {/* Confirm button */}
+      <button
+        onClick={() => { onConfirm(leverage); onClose(); }}
+        className="w-[343px] h-[44px] bg-[#0a68f4] rounded-[8px] flex items-center justify-center hover:opacity-90 active:opacity-80 transition-opacity"
+      >
+        <span className="font-['Inter',sans-serif] font-semibold text-[14px] leading-[20px] text-white">
+          Confirm
+        </span>
+      </button>
 
       {/* Home indicator */}
       <div className="w-[134px] h-[34px] flex items-end justify-center pb-2">

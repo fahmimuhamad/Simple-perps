@@ -4,6 +4,13 @@ import { useState, useRef } from "react";
 import OrderTypeSheet from "./OrderTypeSheet";
 import PositionCard from "./PositionCard";
 import CoachmarkOverlay, { CoachmarkStep } from "./CoachmarkOverlay";
+import LiveChart from "./LiveChart";
+import AddRemoveMarginSheet from "./AddRemoveMarginSheet";
+import TpSlSheet from "./TpSlSheet";
+import LeverageSheet from "./LeverageSheet";
+import { useBinancePrice } from "../hooks/useBinancePrice";
+import { useBinanceKlines } from "../hooks/useBinanceKlines";
+import { useFundingRate, useLongShortRatio } from "../hooks/useBinanceFutures";
 
 type Side = "Long" | "Short";
 
@@ -100,38 +107,7 @@ function IconWallet({ active }: { active?: boolean }) {
   );
 }
 
-function ChartPlaceholder() {
-  return (
-    <div className="relative w-full h-[274px] overflow-hidden">
-      <svg viewBox="0 0 375 260" fill="none" className="absolute inset-0 w-full h-full" preserveAspectRatio="none">
-        <defs>
-          <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#25a764" stopOpacity="0.2" />
-            <stop offset="100%" stopColor="#25a764" stopOpacity="0" />
-          </linearGradient>
-        </defs>
-        <path d="M0 180 L20 170 L40 175 L60 155 L80 160 L100 140 L120 145 L140 120 L160 130 L170 100 L180 110 L190 90 L200 80 L210 95 L220 75 L230 85 L240 70 L260 80 L280 65 L300 75 L320 60 L340 70 L360 55 L375 60" stroke="#25a764" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-        <path d="M0 180 L20 170 L40 175 L60 155 L80 160 L100 140 L120 145 L140 120 L160 130 L170 100 L180 110 L190 90 L200 80 L210 95 L220 75 L230 85 L240 70 L260 80 L280 65 L300 75 L320 60 L340 70 L360 55 L375 60 L375 260 L0 260 Z" fill="url(#chartGrad)" />
-        <circle cx="375" cy="60" r="4" fill="#25a764" />
-        <circle cx="375" cy="60" r="8" fill="#25a764" fillOpacity="0.2" />
-      </svg>
-      <span className="absolute top-0 left-[100px] font-['Inter',sans-serif] text-[10px] leading-[12px] text-[#8d8e8e]">70.488,5</span>
-      <span className="absolute bottom-[20px] left-[50px] font-['Inter',sans-serif] text-[10px] leading-[12px] text-[#8d8e8e]">341.747.942</span>
-      <div className="absolute bottom-0 left-0 right-0 border-t border-[rgba(2,2,3,0.2)]" />
-      <div className="absolute bottom-0 left-0 right-0 flex gap-[36px] px-[8px] pb-[3px]">
-        {["12:15", "12:30", "12:45", "13:00", "13:15"].map((t) => (
-          <span key={t} className="font-['Inter',sans-serif] text-[8px] leading-[14px] text-[#8d8e8e]">{t}</span>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 const TIMEFRAMES = ["1m", "15m", "1H", "4H", "1D"];
-
-// Simulated "current" price for position P&L calculation
-const CURRENT_PRICE = 72000;
-const ENTRY_PRICE = 70488.5;
 
 interface OpenPosition {
   side: Side;
@@ -146,11 +122,43 @@ interface OpenPosition {
 
 export default function InitialScreen() {
   const [activeTimeframe, setActiveTimeframe] = useState("15m");
+  const [chartType, setChartType] = useState<"line" | "candle">("line");
   const [openSheet, setOpenSheet] = useState<Side | null>(null);
   const [position, setPosition] = useState<OpenPosition | null>(null);
+  const [showMarginSheet, setShowMarginSheet] = useState(false);
+  const [showTpSlSheet, setShowTpSlSheet] = useState(false);
+  const [showLeverageSheet, setShowLeverageSheet] = useState(false);
   const [coachmarkStep, setCoachmarkStep] = useState<CoachmarkStep | null>(null);
   const [hasSeenCoachmark, setHasSeenCoachmark] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Live Binance data
+  const ticker = useBinancePrice("btcusdt");
+  const klines = useBinanceKlines("BTCUSDT", activeTimeframe, 80);
+  const { funding, countdown } = useFundingRate("BTCUSDT");
+  const longShort = useLongShortRatio("BTCUSDT");
+
+  // Format price for display (e.g. 70488.5 → "70,488.5")
+  function formatDisplayPrice(n: number): string {
+    return n.toLocaleString("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  }
+
+  // Format price as European format string for OrderTypeSheet (e.g. 70488.5 → "70.488,5")
+  function toEuropeanPrice(n: number): string {
+    const [int, dec] = n.toFixed(1).split(".");
+    const intFormatted = parseInt(int).toLocaleString("de-DE");
+    return `${intFormatted},${dec}`;
+  }
+
+  const livePrice = ticker?.price ?? 0;
+  const livePriceDisplay = livePrice > 0 ? formatDisplayPrice(livePrice) : "—";
+  const livePriceForSheet = livePrice > 0 ? toEuropeanPrice(livePrice) : "70.488,5";
+
+  const changeAbs = ticker?.change ?? 0;
+  const changePct = ticker?.changePct ?? 0;
+  const changePositive = changeAbs >= 0;
+  const changeColor = changePositive ? "#25a764" : "#e54040";
+  const changeLabel = `${changePositive ? "+" : ""}${formatDisplayPrice(Math.abs(changeAbs))} (${changePositive ? "+" : ""}${changePct.toFixed(2)}%)`;
 
   function handleOrderConfirm(pos: OpenPosition) {
     setPosition(pos);
@@ -159,6 +167,40 @@ export default function InitialScreen() {
     if (!hasSeenCoachmark) {
       setCoachmarkStep(1);
     }
+  }
+
+  function handleMarginConfirm(newMargin: number) {
+    if (!position) return;
+    const newLeverage = newMargin > 0 ? position.positionSize / newMargin : position.leverage;
+    const isLong = position.side === "Long";
+    const newEstLiqPrice = newLeverage >= 1
+      ? isLong
+        ? position.entryPrice * (1 - 1 / newLeverage)
+        : position.entryPrice * (1 + 1 / newLeverage)
+      : 0;
+    setPosition({
+      ...position,
+      margin: newMargin,
+      leverage: newLeverage,
+      estLiqPrice: newEstLiqPrice,
+    });
+  }
+
+  function handleTpSlConfirm(tpPrice: number, slPrice: number) {
+    if (!position) return;
+    setPosition({ ...position, tpPrice, slPrice });
+  }
+
+  function handleLeverageConfirm(newLeverage: number) {
+    if (!position) return;
+    const newPositionSize = position.margin * newLeverage;
+    const isLong = position.side === "Long";
+    const newEstLiqPrice = newLeverage >= 1
+      ? isLong
+        ? position.entryPrice * (1 - 1 / newLeverage)
+        : position.entryPrice * (1 + 1 / newLeverage)
+      : 0;
+    setPosition({ ...position, leverage: newLeverage, positionSize: newPositionSize, estLiqPrice: newEstLiqPrice });
   }
 
   function handleCoachmarkNext() {
@@ -200,18 +242,42 @@ export default function InitialScreen() {
 
       {/* Navigation bar */}
       <div className="h-[48px] bg-white flex items-center justify-between px-[16px] shrink-0">
-        <div className="flex items-center gap-[8px]">
-          <button className="w-[20px] h-[20px] flex items-center justify-center"><IconMenu /></button>
-          <div className="w-[16px] h-[16px] rounded-full bg-[#F78B1A] flex items-center justify-center overflow-hidden shrink-0">
+        {/* Left: menu + coin + name/pair */}
+        <div className="flex items-center gap-[4px]">
+          <button className="w-[20px] h-[20px] flex items-center justify-center shrink-0">
+            <IconMenu />
+          </button>
+          {/* BTC coin icon */}
+          <div className="w-[16px] h-[16px] rounded-full bg-[#F78B1A] flex items-center justify-center overflow-hidden shrink-0 ml-[4px]">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <circle cx="8" cy="8" r="8" fill="#F78B1A" />
               <text x="8" y="11" textAnchor="middle" fill="white" fontSize="8" fontWeight="bold">₿</text>
             </svg>
           </div>
-          <span className="font-['Inter',sans-serif] font-semibold text-[14px] leading-[20px] text-[#020203]">Bitcoin</span>
-          <IconStar />
+          {/* Name + pair stacked */}
+          <div className="flex flex-col items-start ml-[4px]">
+            <span className="font-['Inter',sans-serif] font-semibold text-[14px] leading-[20px] text-[#020203]">Bitcoin</span>
+            <span className="font-['Inter',sans-serif] text-[10px] leading-[14px] text-[#626363]">BTCUSDT-PERP</span>
+          </div>
         </div>
-        <button className="w-[20px] h-[20px] flex items-center justify-center"><IconDots /></button>
+        {/* Right: star + controller */}
+        <div className="flex items-center gap-[8px]">
+          {/* Star (filled orange) */}
+          <button className="w-[20px] h-[20px] flex items-center justify-center">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M10 2.5l2.17 4.4 4.85.7-3.51 3.42.83 4.83L10 13.5l-4.34 2.35.83-4.83L2.98 7.6l4.85-.7L10 2.5z" fill="#F78B1A" />
+            </svg>
+          </button>
+          {/* Game controller */}
+          <button className="w-[20px] h-[20px] flex items-center justify-center">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <rect x="2" y="6" width="16" height="10" rx="3" stroke="#020203" strokeWidth="1.3" />
+              <path d="M7 9v4M5 11h4" stroke="#020203" strokeWidth="1.3" strokeLinecap="round" />
+              <circle cx="13" cy="10" r="0.8" fill="#020203" />
+              <circle cx="15" cy="12" r="0.8" fill="#020203" />
+            </svg>
+          </button>
+        </div>
       </div>
 
       {/* Scrollable content */}
@@ -219,17 +285,28 @@ export default function InitialScreen() {
         {/* Price + Funding */}
         <div className="px-[16px] pt-[8px] pb-[4px] flex items-start justify-between">
           <div className="flex flex-col gap-[4px]">
-            <span className="font-['Neue_Haas_Grotesk_Display_Pro',sans-serif] text-[20px] leading-[24px] text-[#020203]">70.488,5</span>
-            <span className="font-['Inter',sans-serif] font-semibold text-[12px] leading-[16px] text-[#25a764]">+345,34 (1,2%)</span>
+            <span className="font-['Neue_Haas_Grotesk_Display_Pro',sans-serif] text-[20px] leading-[24px] text-[#020203]">
+              {livePriceDisplay}
+            </span>
+            <span
+              className="font-['Inter',sans-serif] font-semibold text-[12px] leading-[16px]"
+              style={{ color: changeColor }}
+            >
+              {ticker ? changeLabel : "—"}
+            </span>
           </div>
           <div className="flex flex-col gap-[4px] items-end">
             <span className="font-['Inter',sans-serif] text-[10px] leading-[14px] text-[#8d8e8e] border-b border-dashed border-[#8d8e8e]">Funding / Countdown</span>
-            <span className="font-['Inter',sans-serif] text-[10px] leading-[14px] text-[#626363]">-0,0063% / 01:49:08</span>
+            <span className="font-['Inter',sans-serif] text-[10px] leading-[14px] text-[#626363]">
+              {funding
+                ? `${(funding.fundingRate * 100).toFixed(4)}% / ${countdown}`
+                : `— / ${countdown}`}
+            </span>
           </div>
         </div>
 
         {/* Chart */}
-        <ChartPlaceholder />
+        <LiveChart klines={klines} chartType={chartType} />
 
         {/* Timeframe bar */}
         <div className="flex items-center justify-between px-[16px] py-[4px]">
@@ -243,16 +320,24 @@ export default function InitialScreen() {
           </div>
           <div className="flex items-center gap-[12px]">
             <div className="bg-[rgba(2,2,3,0.1)] flex items-center p-[1.3px] rounded-full overflow-hidden">
-              <div className="bg-white flex items-center p-[2.7px] rounded-full">
+              <button
+                onClick={() => setChartType("line")}
+                className="flex items-center p-[2.7px] rounded-full transition-colors"
+                style={{ background: chartType === "line" ? "#ffffff" : "transparent", opacity: chartType === "line" ? 1 : 0.6 }}
+              >
                 <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M1 8L4 5l2.5 2.5L9 3" stroke="#020203" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
-              </div>
-              <div className="flex items-center p-[2.7px] rounded-full opacity-60">
+              </button>
+              <button
+                onClick={() => setChartType("candle")}
+                className="flex items-center p-[2.7px] rounded-full transition-colors"
+                style={{ background: chartType === "candle" ? "#ffffff" : "transparent", opacity: chartType === "candle" ? 1 : 0.6 }}
+              >
                 <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
                   <rect x="2" y="4" width="2" height="5" rx="0.5" stroke="#020203" strokeWidth="1" />
                   <rect x="7" y="2" width="2" height="7" rx="0.5" stroke="#020203" strokeWidth="1" />
                   <path d="M3 6.5V4M8 4.5V2" stroke="#020203" strokeWidth="1" strokeLinecap="round" />
                 </svg>
-              </div>
+              </button>
             </div>
             <button className="w-[20px] h-[20px] flex items-center justify-center">
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 3h5M3 3v5M17 3h-5M17 3v5M3 17h5M3 17v-5M17 17h-5M17 17v-5" stroke="#020203" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
@@ -262,24 +347,31 @@ export default function InitialScreen() {
 
         {/* Pintu Users Positions */}
         <div className="px-[16px] py-[8px] flex flex-col gap-[8px]">
-          <span className="font-['Inter',sans-serif] font-semibold text-[14px] leading-[20px] text-[#020203]">Pintu Users Positions</span>
+          <span className="font-['Inter',sans-serif] font-semibold text-[14px] leading-[20px] text-[#020203]">User Position Distribution</span>
           <div className="flex flex-col gap-[2px]">
             <div className="flex gap-[4px] w-full">
-              <div className="bg-[#25a764] h-[4px] rounded-l-[4px]" style={{ width: "70%" }} />
+              <div
+                className="bg-[#25a764] h-[4px] rounded-l-[4px] transition-all duration-500"
+                style={{ width: `${longShort?.longPct ?? 70}%` }}
+              />
               <div className="bg-[#e54040] h-[4px] rounded-r-[4px] flex-1" />
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-[8px]">
                 <div className="w-[8px] h-[8px] rounded-full bg-[#25a764]" />
-                <span className="font-['Inter',sans-serif] font-semibold text-[12px] leading-[16px] text-[#020203]">70% Long</span>
+                <span className="font-['Inter',sans-serif] font-semibold text-[12px] leading-[16px] text-[#020203]">
+                  {longShort ? `${longShort.longPct.toFixed(1)}% Long` : "— Long"}
+                </span>
               </div>
               <div className="flex items-center gap-[8px]">
                 <div className="w-[8px] h-[8px] rounded-full bg-[#e54040]" />
-                <span className="font-['Inter',sans-serif] font-semibold text-[12px] leading-[16px] text-[#020203]">30% Short</span>
+                <span className="font-['Inter',sans-serif] font-semibold text-[12px] leading-[16px] text-[#020203]">
+                  {longShort ? `${longShort.shortPct.toFixed(1)}% Short` : "— Short"}
+                </span>
               </div>
             </div>
           </div>
-          <span className="font-['Inter',sans-serif] text-[10px] leading-[14px] text-[#626363]">What other users hold right now. Not a financial recommendation.</span>
+          <span className="font-['Inter',sans-serif] text-[10px] leading-[14px] text-[#626363]">Based on current open positions by other Pintu users for this asset. This is not a financial advice.</span>
         </div>
 
         {/* Divider */}
@@ -313,18 +405,21 @@ export default function InitialScreen() {
               side={position.side}
               leverage={position.leverage}
               entryPrice={position.entryPrice}
-              currentPrice={CURRENT_PRICE}
+              currentPrice={livePrice > 0 ? livePrice : position.entryPrice}
               positionSize={position.positionSize}
               margin={position.margin}
               estLiqPrice={position.estLiqPrice}
               tpPrice={position.tpPrice}
               slPrice={position.slPrice}
+              onAdjustMargin={() => setShowMarginSheet(true)}
+              onEditTpSl={() => setShowTpSlSheet(true)}
+              onAdjustLeverage={() => setShowLeverageSheet(true)}
             />
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center gap-[8px] py-[32px]">
             <IconDocument />
-            <span className="font-['Inter',sans-serif] font-semibold text-[12px] leading-[16px] text-[#626363]">No Open Orders</span>
+            <span className="font-['Inter',sans-serif] font-semibold text-[12px] leading-[16px] text-[#626363]">No Open Positions</span>
           </div>
         )}
 
@@ -366,7 +461,7 @@ export default function InitialScreen() {
               <OrderTypeSheet
                 side={openSheet}
                 assetTicker="BTC"
-                price="70.488,5"
+                price={livePriceForSheet}
                 initialLeverage={25}
                 availableMargin="300"
                 onConfirm={(pos) => handleOrderConfirm(pos)}
@@ -385,6 +480,69 @@ export default function InitialScreen() {
           onNext={handleCoachmarkNext}
           onDone={handleCoachmarkDone}
         />
+      )}
+
+      {/* Add/Remove Margin Sheet overlay */}
+      {showMarginSheet && position && (
+        <div className="absolute inset-0 z-10">
+          <div className="absolute inset-0 bg-black/70" onClick={() => setShowMarginSheet(false)} />
+          <div className="absolute inset-0 flex items-end pointer-events-none">
+            <div className="pointer-events-auto w-full">
+              <AddRemoveMarginSheet
+                assetTicker="BTC"
+                side={position.side}
+                leverage={position.leverage}
+                margin={position.margin}
+                positionSize={position.positionSize}
+                entryPrice={position.entryPrice}
+                availableBalance={300}
+                onConfirm={handleMarginConfirm}
+                onClose={() => setShowMarginSheet(false)}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+      {/* TP/SL Sheet overlay */}
+      {showTpSlSheet && position && (
+        <div className="absolute inset-0 z-10">
+          <div className="absolute inset-0 bg-black/70" onClick={() => setShowTpSlSheet(false)} />
+          <div className="absolute inset-0 flex items-end pointer-events-none">
+            <div className="pointer-events-auto w-full">
+              <TpSlSheet
+                side={position.side}
+                entryPrice={position.entryPrice}
+                positionSize={position.positionSize}
+                leverage={position.leverage}
+                tpPrice={position.tpPrice}
+                slPrice={position.slPrice}
+                tpEnabled={position.tpPrice > 0}
+                slEnabled={position.slPrice > 0}
+                estLiqPrice={position.estLiqPrice}
+                onConfirm={handleTpSlConfirm}
+                onClose={() => setShowTpSlSheet(false)}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Leverage Sheet overlay */}
+      {showLeverageSheet && position && (
+        <div className="absolute inset-0 z-10">
+          <div className="absolute inset-0 bg-black/70" onClick={() => setShowLeverageSheet(false)} />
+          <div className="absolute inset-0 flex items-end pointer-events-none">
+            <div className="pointer-events-auto w-full">
+              <LeverageSheet
+                initialLeverage={Math.round(position.leverage)}
+                margin={position.margin}
+                entryPrice={position.entryPrice}
+                onConfirm={handleLeverageConfirm}
+                onClose={() => setShowLeverageSheet(false)}
+              />
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
