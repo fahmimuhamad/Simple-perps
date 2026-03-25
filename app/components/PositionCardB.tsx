@@ -14,12 +14,10 @@ interface PositionCardBProps {
   currentPrice: number;
   positionSize: number;
   margin: number;
-  estLiqPrice: number;
-  tpPrice?: number;
   slPrice: number;
   onAdjustMargin?: () => void;
   onEditTpSl?: () => void;
-  onAdjustLeverage?: () => void;
+  onClosePosition?: () => void;
 }
 
 function formatEuropean(n: number, decimals = 2): string {
@@ -35,10 +33,10 @@ export default function PositionCardB({
   currentPrice,
   positionSize,
   margin,
-  tpPrice: _tpPrice,
   slPrice,
   onAdjustMargin,
   onEditTpSl,
+  onClosePosition,
 }: PositionCardBProps) {
   const isLong = side === "Long";
   const sideColor = isLong ? "#25a764" : "#e54040";
@@ -176,7 +174,7 @@ export default function PositionCardB({
               Adjust Position
             </span>
           </button>
-          <button className="border border-[rgba(2,2,3,0.1)] rounded-[4px] h-[44px] flex-1 flex items-center justify-center hover:bg-[#f2f2f2] transition-colors">
+          <button className="border border-[rgba(2,2,3,0.1)] rounded-[4px] h-[44px] flex-1 flex items-center justify-center hover:bg-[#f2f2f2] transition-colors" onClick={onClosePosition}>
             <span className="font-['Inter',sans-serif] font-semibold text-[14px] leading-[20px] text-[#020203]">
               Close Position
             </span>

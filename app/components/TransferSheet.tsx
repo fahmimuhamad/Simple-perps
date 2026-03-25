@@ -5,6 +5,7 @@ import TransferConfirmationSheet from "./TransferConfirmationSheet";
 import TransferSuccessScreen from "./TransferSuccessScreen";
 
 const AVAILABLE = 300;
+const USDT_TO_IDR_RATE = 15382;
 
 const KEYBOARD_ROWS = [
   ["1", "2", "3"],
@@ -100,8 +101,8 @@ export default function TransferSheet({ available = AVAILABLE, onConfirm, onClos
 
   const numericAmount = parseFloat(amount) || 0;
   const canTransfer = numericAmount > 0 && numericAmount <= available;
-  // Approximate IDR conversion (1 USDT ≈ 15,382 IDR)
-  const idrValue = (numericAmount * 15382).toLocaleString("id-ID", { maximumFractionDigits: 0 });
+  // Approximate IDR conversion
+  const idrValue = (numericAmount * USDT_TO_IDR_RATE).toLocaleString("id-ID", { maximumFractionDigits: 0 });
 
   function handleKey(key: string) {
     if (key === "") return;
@@ -140,9 +141,9 @@ export default function TransferSheet({ available = AVAILABLE, onConfirm, onClos
       )}
       {showConfirmation && !showSuccess && (
         <TransferConfirmationSheet
-          idrAmount={numericAmount * 15382}
+          idrAmount={numericAmount * USDT_TO_IDR_RATE}
           usdtAmount={numericAmount}
-          estRate={15382}
+          estRate={USDT_TO_IDR_RATE}
           onConfirm={() => {
             setShowConfirmation(false);
             setShowSuccess(true);

@@ -454,12 +454,9 @@ export default function InitialScreen({ onNavigateHome, variant = "A" }: Initial
                 currentPrice={livePrice > 0 ? livePrice : position.entryPrice}
                 positionSize={position.positionSize}
                 margin={position.margin}
-                estLiqPrice={position.estLiqPrice}
-                tpPrice={position.tpPrice}
                 slPrice={position.slPrice}
                 onAdjustMargin={() => setShowMarginSheet(true)}
                 onEditTpSl={() => setShowTpSlSheet(true)}
-                onAdjustLeverage={() => setShowLeverageSheet(true)}
               />
             ) : (
               <PositionCard
@@ -667,7 +664,6 @@ export default function InitialScreen({ onNavigateHome, variant = "A" }: Initial
                 side={position.side}
                 entryPrice={position.entryPrice}
                 positionSize={position.positionSize}
-                leverage={position.leverage}
                 tpPrice={position.tpPrice}
                 slPrice={position.slPrice}
                 tpEnabled={position.tpPrice > 0}
@@ -730,7 +726,6 @@ export default function InitialScreen({ onNavigateHome, variant = "A" }: Initial
                 side={openSheet}
                 entryPrice={parseFloat(livePriceForSheet.replace(/\./g, "").replace(",", ".")) || 0}
                 positionSize={orderTpSlInit.positionSize}
-                leverage={orderTpSlInit.leverage}
                 tpPrice={orderTpSlInit.tpPrice}
                 slPrice={orderTpSlInit.slPrice}
                 tpEnabled={orderTpSlInit.tpEnabled}

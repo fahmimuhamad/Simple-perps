@@ -2,10 +2,11 @@
 
 interface InsufficientMarginSheetProps {
   onTransfer: () => void;
+  onBuyUsdt?: () => void;
   onClose: () => void;
 }
 
-export default function InsufficientMarginSheet({ onTransfer, onClose }: InsufficientMarginSheetProps) {
+export default function InsufficientMarginSheet({ onTransfer, onBuyUsdt, onClose }: InsufficientMarginSheetProps) {
   return (
     <div className="absolute inset-0 z-20 flex flex-col items-center justify-end" style={{ backgroundColor: "rgba(0,0,0,0.7)" }} onClick={onClose}>
       {/* Drag indicator */}
@@ -70,6 +71,7 @@ export default function InsufficientMarginSheet({ onTransfer, onClose }: Insuffi
               </span>
             </button>
             <button
+              onClick={onBuyUsdt}
               className="flex h-[40px] items-center justify-center w-full"
             >
               <span

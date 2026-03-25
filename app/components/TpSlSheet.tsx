@@ -9,7 +9,6 @@ interface TpSlSheetProps {
   side: Side;
   entryPrice: number;
   positionSize: number;
-  leverage: number;
   tpPrice: number;
   slPrice: number;
   tpEnabled: boolean;
@@ -62,7 +61,6 @@ export default function TpSlSheet({
   side,
   entryPrice,
   positionSize,
-  leverage,
   tpPrice: initialTpPrice,
   slPrice: initialSlPrice,
   tpEnabled: initialTpEnabled,

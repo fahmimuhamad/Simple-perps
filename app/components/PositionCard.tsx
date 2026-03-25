@@ -16,6 +16,7 @@ interface PositionCardProps {
   onAdjustMargin?: () => void;
   onEditTpSl?: () => void;
   onAdjustLeverage?: () => void;
+  onClosePosition?: () => void;
 }
 
 function formatPrice(n: number): string {
@@ -45,6 +46,7 @@ export default function PositionCard({
   onAdjustMargin,
   onEditTpSl,
   onAdjustLeverage,
+  onClosePosition,
 }: PositionCardProps) {
   const isLong = side === "Long";
   const sideColor = isLong ? "#25a764" : "#e54040";
@@ -234,7 +236,7 @@ export default function PositionCard({
               Adjust Leverage
             </span>
           </button>
-          <button className="border border-[rgba(2,2,3,0.1)] rounded-[4px] h-[44px] flex-1 flex items-center justify-center hover:bg-[#f2f2f2] transition-colors">
+          <button className="border border-[rgba(2,2,3,0.1)] rounded-[4px] h-[44px] flex-1 flex items-center justify-center hover:bg-[#f2f2f2] transition-colors" onClick={onClosePosition}>
             <span className="font-['Inter',sans-serif] font-semibold text-[14px] leading-[20px] text-[#020203]">
               Close Position
             </span>

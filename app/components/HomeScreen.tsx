@@ -191,7 +191,6 @@ function AcademyCard({ title, color }: { title: string; color: string }) {
 }
 
 interface HomeScreenProps {
-  variant?: "A" | "B";
   onNavigateFutures: () => void;
 }
 

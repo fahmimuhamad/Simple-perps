@@ -1,6 +1,6 @@
 "use client";
 
-const RATE = 15382; // 1 USDT ≈ IDR 15,382
+const USDT_TO_IDR_RATE = 15382; // 1 USDT ≈ IDR 15,382
 
 // Check circle icons (from Figma)
 const imgCheckFill  = "https://www.figma.com/api/mcp/asset/68a93d4c-3820-4b95-aed5-0613b7d403ad";
@@ -43,7 +43,7 @@ function SuccessIcon() {
 }
 
 export default function TransferSuccessScreen({ usdtAmount, onOk, onTrade }: TransferSuccessScreenProps) {
-  const idrAmount    = Math.round(usdtAmount * RATE);
+  const idrAmount    = Math.round(usdtAmount * USDT_TO_IDR_RATE);
   const fee          = (usdtAmount * 0.025).toFixed(3); // mock 2.5% fee
   const received     = (usdtAmount - parseFloat(fee)).toFixed(2);
 

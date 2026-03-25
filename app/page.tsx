@@ -47,7 +47,7 @@ export default function Home() {
           />
         )}
         {screen === "home" && (
-          <HomeScreen variant={variant} onNavigateFutures={handleNavigateFutures} />
+          <HomeScreen onNavigateFutures={handleNavigateFutures} />
         )}
         {showOnboarding && (
           <OnboardingSheet onDone={handleOnboardingDone} />

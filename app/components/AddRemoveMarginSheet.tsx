@@ -57,7 +57,7 @@ export default function AddRemoveMarginSheet({
   const maxAdd = availableBalance;
   // Can only remove margin while keeping leverage reasonable (keep liq price safe)
   // Max removable = margin - (positionSize / MAX_LEVERAGE), floor at 0
-  const maxRemove = Math.max(0, margin - positionSize / 100);
+  const maxRemove = Math.max(0, margin - positionSize / leverage);
 
   const maxAmount = tab === "add" ? maxAdd : maxRemove;
 
