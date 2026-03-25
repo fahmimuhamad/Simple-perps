@@ -141,13 +141,13 @@ export default function AddRemoveMarginSheet({
   }
 
   return (
-    <div className="bg-white w-[375px] rounded-t-[8px] pt-[8px] flex flex-col gap-[24px] items-center">
+    <div className="bg-white w-full rounded-t-[8px] pt-[8px] flex flex-col gap-[24px] items-center">
       {/* Drag handle */}
       <div className="bg-[#8d8e8e] h-[4px] rounded-full w-[40px]" />
 
       <div className="flex flex-col gap-[16px] items-center w-full">
         {/* Segmented control */}
-        <div className="bg-[#f2f2f2] flex items-start p-[2px] rounded-[8px] w-[343px]">
+        <div className="bg-[#f2f2f2] flex items-start p-[2px] rounded-[8px] w-[calc(100%-32px)]">
           {(["add", "remove"] as Tab[]).map((t) => (
             <button
               key={t}
@@ -217,7 +217,7 @@ export default function AddRemoveMarginSheet({
           </div>
 
           {/* Input + Slider */}
-          <div className="flex flex-col gap-[8px] items-start w-[343px]">
+          <div className="flex flex-col gap-[8px] items-start w-[calc(100%-32px)]">
             {/* Input field area */}
             <div className="relative w-full" style={{ height: 56 }}>
               {/* Top labels */}
@@ -297,7 +297,7 @@ export default function AddRemoveMarginSheet({
           </div>
 
           {/* Est. Liquidation Price card */}
-          <div className="bg-[#fafafa] rounded-[10px] p-[12px] flex items-center w-[343px]">
+          <div className="bg-[#fafafa] rounded-[10px] p-[12px] flex items-center w-[calc(100%-32px)]">
             <span className="font-['Inter',sans-serif] text-[14px] leading-[20px] text-[#8d8e8e] flex-1">
               Est Liquidation Price
             </span>
@@ -326,7 +326,7 @@ export default function AddRemoveMarginSheet({
         <button
           onClick={handleConfirm}
           disabled={inputAmount <= 0}
-          className="w-[343px] h-[44px] bg-[#0a68f4] rounded-[8px] flex items-center justify-center transition-opacity"
+          className="w-[calc(100%-32px)] h-[44px] bg-[#0a68f4] rounded-[8px] flex items-center justify-center transition-opacity"
           style={{ opacity: inputAmount <= 0 ? 0.4 : 1, cursor: inputAmount <= 0 ? "not-allowed" : "pointer" }}
         >
           <span className="font-['Inter',sans-serif] font-semibold text-[14px] leading-[20px] text-white">

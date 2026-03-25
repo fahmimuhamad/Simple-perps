@@ -30,7 +30,7 @@ function parseKlines(raw: unknown[][]): Kline[] {
   }));
 }
 
-export function useBinanceKlines(symbol = "BTCUSDT", timeframe = "15m", limit = 80): Kline[] {
+export function useBinanceKlines(symbol = "BTCUSDT", timeframe = "15m", limit = 500): Kline[] {
   const [klines, setKlines] = useState<Kline[]>([]);
   const interval = INTERVAL_MAP[timeframe] ?? "15m";
   const wsRef = useRef<WebSocket | null>(null);

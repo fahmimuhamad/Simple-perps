@@ -79,9 +79,9 @@ export default function ConfirmationSheet({
   ];
 
   return (
-    <div className="bg-white w-[375px] rounded-t-[8px] pt-[16px] flex flex-col gap-[24px] items-center">
+    <div className="bg-white w-full rounded-t-[8px] pt-[16px] flex flex-col gap-[24px] items-center">
       {/* Title */}
-      <div className="flex flex-col gap-[4px] items-center w-[343px] pb-[8px]">
+      <div className="flex flex-col gap-[4px] items-center w-full px-[16px] pb-[8px]">
         <span
           className="text-[20px] leading-[24px] text-[#020203] text-center w-full"
           style={{ fontFamily: "'Neue Haas Grotesk Display Pro', sans-serif", fontWeight: 700 }}
@@ -91,7 +91,7 @@ export default function ConfirmationSheet({
       </div>
 
       {/* Summary rows */}
-      <div className="flex flex-col gap-[12px] w-[343px]">
+      <div className="flex flex-col gap-[12px] w-full px-[16px]">
         {rows.map(({ label, value }) => (
           <div key={label} className="flex items-start justify-between w-full">
             <span className="font-['Inter',sans-serif] text-[14px] leading-[20px] text-[#020203] w-[160px]">
@@ -109,7 +109,7 @@ export default function ConfirmationSheet({
       </div>
 
       {/* Divider */}
-      <div className="w-[343px] h-px bg-[rgba(2,2,3,0.1)]" />
+      <div className="w-full px-[16px]"><div className="h-px bg-[rgba(2,2,3,0.1)]" /></div>
 
       {/* Don't show again */}
       <div className="flex gap-[8px] items-start w-full px-[16px]">
@@ -133,7 +133,7 @@ export default function ConfirmationSheet({
       </div>
 
       {/* Buttons */}
-      <div className="flex flex-col gap-[8px] items-center w-[343px]">
+      <div className="flex flex-col gap-[8px] items-center w-full px-[16px]">
         <button
           onClick={onConfirm}
           className="w-full h-[40px] bg-[#0a68f4] rounded-[8px] flex items-center justify-center hover:opacity-90 active:opacity-80 transition-opacity"

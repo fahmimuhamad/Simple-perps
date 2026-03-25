@@ -1,9 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import LeverageSheet from "./LeverageSheet";
-import ConfirmationSheet from "./ConfirmationSheet";
-import TpSlSheet from "./TpSlSheet";
+import InsufficientMarginSheet from "./InsufficientMarginSheet";
 
 type Side = "Long" | "Short";
 
@@ -18,7 +16,7 @@ const KEYBOARD_ROWS = [
 const DEFAULT_TP_PCT = 8;
 const DEFAULT_SL_PCT = 4;
 
-interface OpenPosition {
+export interface OpenPosition {
   side: Side;
   leverage: number;
   positionSize: number;
@@ -37,6 +35,19 @@ interface OrderTypeSheetProps {
   availableMargin?: string;
   onConfirm?: (pos: OpenPosition) => void;
   onClose?: () => void;
+  onOpenTransfer?: () => void;
+  // Overlay triggers — parent renders the actual sheets at full-frame level
+  onOpenLeverage?: (leverage: number, margin: number, entryPrice: number) => void;
+  onOpenConfirmation?: (pos: OpenPosition) => void;
+  onOpenTpSl?: (tpPrice: number, slPrice: number, tpEnabled: boolean, slEnabled: boolean, positionSize: number, leverage: number, estLiqPrice: number) => void;
+  // Controlled leverage & tpsl (set by parent after overlay confirms)
+  leverage?: number;
+  onLeverageChange?: (lev: number) => void;
+  tpPrice?: number;
+  slPrice?: number;
+  tpEnabled?: boolean;
+  slEnabled?: boolean;
+  onTpSlChange?: (tpPrice: number, slPrice: number) => void;
 }
 
 export default function OrderTypeSheet({
@@ -44,21 +55,36 @@ export default function OrderTypeSheet({
   side: initialSide = "Long",
   price = "70.488,5",
   initialLeverage = 25,
-  availableMargin = "300",
+  availableMargin = "0",
   onConfirm,
   onClose,
+  onOpenTransfer,
+  onOpenLeverage,
+  onOpenConfirmation,
+  onOpenTpSl,
+  leverage: controlledLeverage,
+  tpPrice: controlledTpPrice,
+  slPrice: controlledSlPrice,
+  tpEnabled: controlledTpEnabled,
+  slEnabled: controlledSlEnabled,
 }: OrderTypeSheetProps) {
   const [side] = useState<Side>(initialSide);
   const [amount, setAmount] = useState("0");
-  const [leverage, setLeverage] = useState(initialLeverage);
-  const [showLeverageSheet, setShowLeverageSheet] = useState(false);
-  const [showConfirmationSheet, setShowConfirmationSheet] = useState(false);
-  const [showTpSlSheet, setShowTpSlSheet] = useState(false);
+  const [internalLeverage, setInternalLeverage] = useState(initialLeverage);
 
   const [tpPct, setTpPct] = useState(DEFAULT_TP_PCT);
   const [slPct, setSlPct] = useState(DEFAULT_SL_PCT);
-  const [tpEnabled, setTpEnabled] = useState(true);
-  const [slEnabled, setSlEnabled] = useState(true);
+  const [internalTpEnabled, setInternalTpEnabled] = useState(true);
+  const [internalSlEnabled, setInternalSlEnabled] = useState(true);
+
+  const [showInsufficientMargin, setShowInsufficientMargin] = useState(false);
+
+  // Use controlled values if provided, otherwise internal
+  const leverage = controlledLeverage ?? internalLeverage;
+  const tpEnabled = controlledTpEnabled ?? internalTpEnabled;
+  const slEnabled = controlledSlEnabled ?? internalSlEnabled;
+
+  const currentMargin = availableMargin;
 
   const isLong = side === "Long";
   const sideColor = isLong ? "#25a764" : "#e54040";
@@ -69,12 +95,16 @@ export default function OrderTypeSheet({
   const margin = parseFloat(amount.replace(",", ".")) || 0;
   const positionSize = margin * leverage;
 
-  const tpPrice = isLong
+  // Compute TP/SL: use controlled prices if provided, else derive from pct
+  const derivedTpPrice = isLong
     ? entryPrice * (1 + tpPct / 100)
     : entryPrice * (1 - tpPct / 100);
-  const slPrice = isLong
+  const derivedSlPrice = isLong
     ? entryPrice * (1 - slPct / 100)
     : entryPrice * (1 + slPct / 100);
+
+  const tpPrice = controlledTpPrice ?? derivedTpPrice;
+  const slPrice = controlledSlPrice ?? derivedSlPrice;
 
   const estLiqPrice = leverage >= 1
     ? isLong
@@ -88,7 +118,6 @@ export default function OrderTypeSheet({
   }
 
   function handleKey(key: string) {
-    const maxMargin = parseFloat(availableMargin.replace(",", ".")) || 0;
     if (key === "⌫") {
       setAmount((prev) => (prev.length > 1 ? prev.slice(0, -1) : "0"));
       return;
@@ -98,100 +127,32 @@ export default function OrderTypeSheet({
       return;
     }
     const next = amount === "0" ? key : amount + key;
-    const nextVal = parseFloat(next.replace(",", ".")) || 0;
-    if (nextVal > maxMargin) {
-      setAmount(String(maxMargin));
-    } else {
-      setAmount(next);
-    }
+    setAmount(next);
   }
 
   function handlePreset(preset: string) {
     const pct = parseInt(preset) / 100;
-    const val = Math.floor(parseFloat(availableMargin.replace(",", ".")) * pct);
+    const val = Math.floor(parseFloat(currentMargin.replace(",", ".")) * pct);
     setAmount(String(val));
-  }
-
-  function handleTpSlConfirm(newTpPrice: number, newSlPrice: number) {
-    setTpEnabled(newTpPrice > 0);
-    setSlEnabled(newSlPrice > 0);
-    if (entryPrice > 0) {
-      if (newTpPrice > 0) {
-        setTpPct(parseFloat((Math.abs((newTpPrice - entryPrice) / entryPrice) * 100).toFixed(2)));
-      }
-      if (newSlPrice > 0) {
-        setSlPct(parseFloat((Math.abs((newSlPrice - entryPrice) / entryPrice) * 100).toFixed(2)));
-      }
-    }
   }
 
   return (
     <div className="relative">
-      {/* Confirmation Sheet overlay */}
-      {showConfirmationSheet && (
-        <div className="fixed inset-0 flex items-end justify-center z-20">
-          <div className="absolute inset-0 bg-black/70" onClick={() => setShowConfirmationSheet(false)} />
-          <div className="relative z-30">
-            <ConfirmationSheet
-              side={side}
-              assetTicker={assetTicker}
-              leverage={leverage}
-              margin={margin}
-              price={price}
-              estLiqPrice={estLiqPrice}
-              onConfirm={() => {
-                setShowConfirmationSheet(false);
-                onConfirm?.({ side, leverage, positionSize, margin, entryPrice, tpPrice, slPrice, estLiqPrice });
-                onClose?.();
-              }}
-              onClose={() => setShowConfirmationSheet(false)}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Leverage Sheet overlay */}
-      {showLeverageSheet && (
-        <div className="fixed inset-0 flex items-end justify-center z-20">
-          <div className="absolute inset-0 bg-black/70" onClick={() => setShowLeverageSheet(false)} />
-          <div className="relative z-30">
-            <LeverageSheet
-              initialLeverage={leverage}
-              margin={margin}
-              entryPrice={entryPrice}
-              onConfirm={(lev) => setLeverage(lev)}
-              onClose={() => setShowLeverageSheet(false)}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* TP/SL Sheet overlay */}
-      {showTpSlSheet && (
-        <div className="fixed inset-0 flex items-end justify-center z-20">
-          <div className="absolute inset-0 bg-black/70" onClick={() => setShowTpSlSheet(false)} />
-          <div className="relative z-30">
-            <TpSlSheet
-              side={side}
-              entryPrice={entryPrice}
-              positionSize={positionSize}
-              leverage={leverage}
-              tpPrice={tpPrice}
-              slPrice={slPrice}
-              tpEnabled={tpEnabled}
-              slEnabled={slEnabled}
-              estLiqPrice={estLiqPrice}
-              onConfirm={handleTpSlConfirm}
-              onClose={() => setShowTpSlSheet(false)}
-            />
-          </div>
-        </div>
+      {/* Insufficient Margin Sheet */}
+      {showInsufficientMargin && (
+        <InsufficientMarginSheet
+          onTransfer={() => {
+            setShowInsufficientMargin(false);
+            onOpenTransfer?.();
+          }}
+          onClose={() => setShowInsufficientMargin(false)}
+        />
       )}
 
       {/* Main Order Sheet */}
-      <div className="bg-white w-[375px] rounded-t-[8px] flex flex-col items-center">
+      <div className="bg-white w-full rounded-t-[8px] flex flex-col items-center">
         {/* Header */}
-        <div className="flex items-center w-[343px] pt-[16px] pb-0">
+        <div className="flex items-center w-full px-[16px] pt-[16px] pb-0">
           <div className="flex flex-col items-start gap-[2px]">
             <p className="font-['Inter',sans-serif] font-semibold text-[16px] leading-[22px] text-[#020203]">
               {isLong ? "Long" : "Short"} {assetTicker}
@@ -220,7 +181,7 @@ export default function OrderTypeSheet({
         </div>
 
         {/* Info Cards */}
-        <div className="flex flex-col gap-[8px] w-[343px]">
+        <div className="flex flex-col gap-[8px] w-full px-[16px]">
           {/* Leverage */}
           <div className="bg-[#fafafa] rounded-[10px] px-[12px] flex flex-col w-full">
             <div className="flex items-center justify-between h-[40px]">
@@ -228,7 +189,7 @@ export default function OrderTypeSheet({
                 Leverage
               </span>
               <button
-                onClick={() => setShowLeverageSheet(true)}
+                onClick={() => onOpenLeverage?.(leverage, margin, entryPrice)}
                 className="flex items-center gap-[4px] px-[4px] py-[2px] rounded-[4px] hover:bg-[#f2f2f2] transition-colors active:scale-95"
               >
                 <span className="font-['Inter',sans-serif] font-semibold text-[12px] leading-[16px] text-[#020203]">
@@ -248,9 +209,9 @@ export default function OrderTypeSheet({
             </span>
             <div className="flex items-center gap-[4px]">
               <span className="font-['Inter',sans-serif] font-semibold text-[12px] leading-[16px] text-[#020203]">
-                USDT {availableMargin}
+                USDT {currentMargin}
               </span>
-              <button className="w-[12px] h-[12px] flex items-center justify-center">
+              <button className="w-[12px] h-[12px] flex items-center justify-center" onClick={() => onOpenTransfer?.()}>
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                   <circle cx="6" cy="6" r="5.5" fill="#0a68f4" />
                   <path d="M6 3.5v5M3.5 6h5" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
@@ -261,7 +222,7 @@ export default function OrderTypeSheet({
         </div>
 
         {/* Preset Buttons */}
-        <div className="flex gap-[8px] px-[24px] w-[375px] mt-[8px]">
+        <div className="flex gap-[8px] px-[24px] w-full mt-[8px]">
           {PRESETS.map((p) => (
             <button
               key={p}
@@ -274,7 +235,7 @@ export default function OrderTypeSheet({
         </div>
 
         {/* Numeric Keyboard */}
-        <div className="flex flex-col w-[375px] h-[200px] mt-[8px]">
+        <div className="flex flex-col w-full h-[200px] mt-[8px]">
           {KEYBOARD_ROWS.map((row, ri) => (
             <div key={ri} className="flex flex-1 items-center justify-center">
               {row.map((key) => (
@@ -302,10 +263,18 @@ export default function OrderTypeSheet({
           ))}
         </div>
 
-        {/* CTA Button — full width with top border, matches Figma */}
+        {/* CTA Button */}
         <div className="w-full border-t border-[rgba(2,2,3,0.1)] px-[16px] py-[12px]">
           <button
-            onClick={() => margin > 0 && setShowConfirmationSheet(true)}
+            onClick={() => {
+              const availBal = parseFloat(currentMargin.replace(",", ".")) || 0;
+              if (margin === 0) return;
+              if (availBal === 0 || margin > availBal) {
+                setShowInsufficientMargin(true);
+              } else {
+                onOpenConfirmation?.({ side, leverage, positionSize, margin, entryPrice, tpPrice, slPrice, estLiqPrice });
+              }
+            }}
             disabled={margin === 0}
             className="w-full h-[44px] rounded-[8px] font-['Inter',sans-serif] font-semibold text-[14px] leading-[20px] text-white flex items-center justify-center transition-opacity"
             style={{

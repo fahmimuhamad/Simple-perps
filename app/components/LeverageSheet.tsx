@@ -119,14 +119,14 @@ export default function LeverageSheet({
   const offset = tickOffset(leverage);
 
   return (
-    <div className="bg-white w-[375px] rounded-t-[8px] pt-[8px] pb-0 flex flex-col gap-[24px] items-center">
+    <div className="bg-white w-full rounded-t-[8px] pt-[8px] pb-0 flex flex-col gap-[24px] items-center">
       {/* Drag handle */}
       <div className="bg-[#8d8e8e] h-[4px] rounded-full w-[40px]" />
 
       {/* Title + description */}
       <div className="flex flex-col gap-[8px] items-center px-[16px] w-full text-center">
         <span
-          className="text-[20px] leading-[24px] text-[#020203] w-[343px]"
+          className="text-[20px] leading-[24px] text-[#020203] w-full text-center"
           style={{ fontFamily: "'Neue Haas Grotesk Display Pro', sans-serif", fontWeight: 500 }}
         >
           Leverage
@@ -141,7 +141,7 @@ export default function LeverageSheet({
       {/* Min / Value / Max + Slider — grouped tightly */}
       <div className="flex flex-col gap-[2px] items-center w-full">
         {/* Min / Value / Max row */}
-        <div className="flex gap-[8px] items-center justify-center w-[343px]">
+        <div className="flex gap-[8px] items-center justify-center w-full px-[16px]">
         <button
           onClick={() => changeLeverage(MIN)}
           className="flex-1 h-[44px] bg-[#f2f2f2] rounded-[8px] flex items-center justify-center hover:bg-[#e8e8e8] active:scale-95 transition-all"
@@ -180,7 +180,7 @@ export default function LeverageSheet({
       {/* ── Ruler / Slider ───────────────────────────────────────── */}
       <div
         ref={containerRef}
-        className="w-[343px] relative overflow-hidden select-none"
+        className="w-full px-[16px] relative overflow-hidden select-none"
         style={{ height: 72, cursor: dragging ? "grabbing" : "grab" }}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
@@ -248,7 +248,7 @@ export default function LeverageSheet({
       </div>
 
       {/* Info cards */}
-      <div className="flex flex-col gap-[8px] items-start w-[343px]">
+      <div className="flex flex-col gap-[8px] items-start w-full px-[16px]">
         {/* Card 1: Investment + Leverage + divider + Position Size */}
         <div className="bg-[#fafafa] rounded-[10px] p-[12px] flex flex-col gap-[10px] w-full">
           <div className="flex items-center justify-between">
@@ -296,7 +296,7 @@ export default function LeverageSheet({
       {/* Confirm button */}
       <button
         onClick={() => { onConfirm(leverage); onClose(); }}
-        className="w-[343px] h-[44px] bg-[#0a68f4] rounded-[8px] flex items-center justify-center hover:opacity-90 active:opacity-80 transition-opacity"
+        className="w-[calc(100%-32px)] h-[44px] bg-[#0a68f4] rounded-[8px] flex items-center justify-center hover:opacity-90 active:opacity-80 transition-opacity"
       >
         <span className="font-['Inter',sans-serif] font-semibold text-[14px] leading-[20px] text-white">
           Confirm

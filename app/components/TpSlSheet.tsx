@@ -151,20 +151,20 @@ export default function TpSlSheet({
     hasError ? "0.5px solid #e54040" : "0.5px solid rgba(2,2,3,0.1)";
 
   return (
-    <div className="bg-white w-[375px] rounded-t-[8px] pt-[8px] flex flex-col gap-[16px] items-center pb-0">
+    <div className="bg-white w-full rounded-t-[8px] pt-[8px] flex flex-col gap-[16px] items-center pb-0">
       {/* Drag indicator */}
       <div className="w-[40px] h-[4px] rounded-full bg-[#8d8e8e]" />
 
       {/* Title */}
       <span
-        className="text-[20px] leading-[24px] text-[#020203] text-center w-[343px]"
+        className="text-[20px] leading-[24px] text-[#020203] text-center w-[calc(100%-32px)]"
         style={{ fontFamily: "'Neue Haas Grotesk Display Pro', sans-serif", fontWeight: 500 }}
       >
         Take Profit/Stop Loss
       </span>
 
       {/* Segmented Control: PnL | Price */}
-      <div className="bg-[#f2f2f2] flex items-start p-[2px] rounded-[8px] w-[343px]">
+      <div className="bg-[#f2f2f2] flex items-start p-[2px] rounded-[8px] w-[calc(100%-32px)]">
         {(["PnL", "Price"] as Mode[]).map((m) => (
           <button
             key={m}
@@ -183,7 +183,7 @@ export default function TpSlSheet({
       </div>
 
       {/* Take Profit Card */}
-      <div className="bg-[#fafafa] flex flex-col gap-[8px] p-[12px] rounded-[8px] w-[343px]">
+      <div className="bg-[#fafafa] flex flex-col gap-[8px] p-[12px] rounded-[8px] w-[calc(100%-32px)]">
         {/* Header row */}
         <div className="flex items-center gap-[6px]">
           <Checkbox checked={tpEnabled} onChange={() => setTpEnabled((v) => !v)} />
@@ -234,7 +234,7 @@ export default function TpSlSheet({
       </div>
 
       {/* Stop Loss Card */}
-      <div className="bg-[#fafafa] flex flex-col gap-[8px] p-[12px] rounded-[8px] w-[343px]">
+      <div className="bg-[#fafafa] flex flex-col gap-[8px] p-[12px] rounded-[8px] w-[calc(100%-32px)]">
         {/* Header row */}
         <div className="flex items-center gap-[6px]">
           <Checkbox checked={slEnabled} onChange={() => setSlEnabled((v) => !v)} />
@@ -295,7 +295,7 @@ export default function TpSlSheet({
       <button
         onClick={handleConfirm}
         disabled={slBelowLiq}
-        className="w-[343px] h-[44px] rounded-[8px] flex items-center justify-center transition-opacity"
+        className="w-[calc(100%-32px)] h-[44px] rounded-[8px] flex items-center justify-center transition-opacity"
         style={{ backgroundColor: "#0a68f4", opacity: slBelowLiq ? 0.4 : 1, cursor: slBelowLiq ? "not-allowed" : "pointer" }}
       >
         <span className="text-[14px] leading-[20px] text-white" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}>

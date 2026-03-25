@@ -3,11 +3,15 @@
 import { useState, useRef } from "react";
 import OrderTypeSheet from "./OrderTypeSheet";
 import PositionCard from "./PositionCard";
+import PositionCardB from "./PositionCardB";
 import CoachmarkOverlay, { CoachmarkStep } from "./CoachmarkOverlay";
+import CoachmarkOverlayB, { CoachmarkStepB } from "./CoachmarkOverlayB";
 import LiveChart from "./LiveChart";
 import AddRemoveMarginSheet from "./AddRemoveMarginSheet";
 import TpSlSheet from "./TpSlSheet";
 import LeverageSheet from "./LeverageSheet";
+import ConfirmationSheet from "./ConfirmationSheet";
+import TransferSheet from "./TransferSheet";
 import { useBinancePrice } from "../hooks/useBinancePrice";
 import { useBinanceKlines } from "../hooks/useBinanceKlines";
 import { useFundingRate, useLongShortRatio } from "../hooks/useBinanceFutures";
@@ -107,6 +111,13 @@ function IconWallet({ active }: { active?: boolean }) {
   );
 }
 
+// ── Bottom Nav Icon assets (from Figma) ─────────────────────────────────────
+const imgNavHome    = "https://www.figma.com/api/mcp/asset/6e416875-ca78-4fd8-8283-dae81af72035";
+const imgNavMarkets = "https://www.figma.com/api/mcp/asset/feda7c4d-c058-419b-af41-6f1b7a99f5e7";
+const imgNavTrade   = "https://www.figma.com/api/mcp/asset/5d999868-aed7-462a-9cf7-794922086c8b";
+const imgNavFutures = "https://www.figma.com/api/mcp/asset/ab636837-5216-4107-853e-26441640c081";
+const imgNavWallet  = "https://www.figma.com/api/mcp/asset/c878f658-0ed4-460a-af6f-843e76fdbfea";
+
 const TIMEFRAMES = ["1m", "15m", "1H", "4H", "1D"];
 
 interface OpenPosition {
@@ -120,7 +131,12 @@ interface OpenPosition {
   estLiqPrice: number;
 }
 
-export default function InitialScreen() {
+interface InitialScreenProps {
+  onNavigateHome?: () => void;
+  variant?: "A" | "B";
+}
+
+export default function InitialScreen({ onNavigateHome, variant = "A" }: InitialScreenProps) {
   const [activeTimeframe, setActiveTimeframe] = useState("15m");
   const [chartType, setChartType] = useState<"line" | "candle">("line");
   const [openSheet, setOpenSheet] = useState<Side | null>(null);
@@ -129,8 +145,25 @@ export default function InitialScreen() {
   const [showTpSlSheet, setShowTpSlSheet] = useState(false);
   const [showLeverageSheet, setShowLeverageSheet] = useState(false);
   const [coachmarkStep, setCoachmarkStep] = useState<CoachmarkStep | null>(null);
+  const [coachmarkStepB, setCoachmarkStepB] = useState<CoachmarkStepB | null>(null);
   const [hasSeenCoachmark, setHasSeenCoachmark] = useState(false);
+  const [showTransferSheet, setShowTransferSheet] = useState(false);
+  const [currentMargin, setCurrentMargin] = useState("0");
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Order sheet sub-overlays (lifted so they cover full frame)
+  const [pendingPos, setPendingPos] = useState<OpenPosition | null>(null);
+  const [showOrderConfirmation, setShowOrderConfirmation] = useState(false);
+  const [showOrderLeverage, setShowOrderLeverage] = useState(false);
+  const [orderLeverageInit, setOrderLeverageInit] = useState<{ leverage: number; margin: number; entryPrice: number } | null>(null);
+  const [showOrderTpSl, setShowOrderTpSl] = useState(false);
+  const [orderTpSlInit, setOrderTpSlInit] = useState<{ tpPrice: number; slPrice: number; tpEnabled: boolean; slEnabled: boolean; positionSize: number; leverage: number; estLiqPrice: number } | null>(null);
+  // Controlled state fed back into OrderTypeSheet
+  const [orderLeverage, setOrderLeverage] = useState(25);
+  const [orderTpPrice, setOrderTpPrice] = useState<number | undefined>(undefined);
+  const [orderSlPrice, setOrderSlPrice] = useState<number | undefined>(undefined);
+  const [orderTpEnabled, setOrderTpEnabled] = useState<boolean | undefined>(undefined);
+  const [orderSlEnabled, setOrderSlEnabled] = useState<boolean | undefined>(undefined);
 
   // Live Binance data
   const ticker = useBinancePrice("btcusdt");
@@ -163,9 +196,12 @@ export default function InitialScreen() {
   function handleOrderConfirm(pos: OpenPosition) {
     setPosition(pos);
     setOpenSheet(null);
-    // Show coachmarks only for first-time users
     if (!hasSeenCoachmark) {
-      setCoachmarkStep(1);
+      if (variant === "B") {
+        setCoachmarkStepB(1);
+      } else {
+        setCoachmarkStep(1);
+      }
     }
   }
 
@@ -216,7 +252,7 @@ export default function InitialScreen() {
   const positionCount = position ? 1 : 0;
 
   return (
-    <div className="relative w-[375px] h-screen bg-white flex flex-col overflow-hidden">
+    <div className="relative w-full h-full bg-white flex flex-col overflow-hidden">
       {/* Status Bar */}
       <div className="h-[44px] bg-white flex items-center justify-between px-[16px] shrink-0">
         <span className="font-['Inter',sans-serif] font-semibold text-[14px] leading-[20px] text-[#020203]">9:41</span>
@@ -306,7 +342,12 @@ export default function InitialScreen() {
         </div>
 
         {/* Chart */}
-        <LiveChart klines={klines} chartType={chartType} />
+        <LiveChart
+          klines={klines}
+          chartType={chartType}
+          entryPrice={variant === "B" && position ? position.entryPrice : undefined}
+          slPrice={variant === "B" && position ? position.slPrice : undefined}
+        />
 
         {/* Timeframe bar */}
         <div className="flex items-center justify-between px-[16px] py-[4px]">
@@ -346,6 +387,7 @@ export default function InitialScreen() {
         </div>
 
         {/* Pintu Users Positions */}
+        {!position && (
         <div className="px-[16px] py-[8px] flex flex-col gap-[8px]">
           <span className="font-['Inter',sans-serif] font-semibold text-[14px] leading-[20px] text-[#020203]">User Position Distribution</span>
           <div className="flex flex-col gap-[2px]">
@@ -373,11 +415,13 @@ export default function InitialScreen() {
           </div>
           <span className="font-['Inter',sans-serif] text-[10px] leading-[14px] text-[#626363]">Based on current open positions by other Pintu users for this asset. This is not a financial advice.</span>
         </div>
+        )}
 
         {/* Divider */}
         <div className="h-px bg-[#f2f2f2] mx-[16px]" />
 
         {/* Long / Short buttons */}
+        {!position && (
         <div className="px-[16px] py-[16px] flex gap-[16px]">
           <button onClick={() => setOpenSheet("Long")} className="flex-1 h-[52px] bg-[#25a764] rounded-[8px] flex flex-col gap-[2px] items-center justify-center overflow-hidden hover:opacity-90 transition-opacity">
             <span className="font-['Inter',sans-serif] font-semibold text-[14px] leading-[20px] text-white">↗ Long</span>
@@ -388,6 +432,7 @@ export default function InitialScreen() {
             <span className="font-['Inter',sans-serif] text-[10px] leading-[14px] text-white text-center px-[8px]">Profit when price goes down</span>
           </button>
         </div>
+        )}
 
         {/* Positions header */}
         <div className="px-[16px] py-[8px] flex items-center justify-between">
@@ -400,21 +445,39 @@ export default function InitialScreen() {
         {/* Position card or empty state */}
         {position ? (
           <div className="px-[16px] pb-[16px]">
-            <PositionCard
-              assetTicker="BTC"
-              side={position.side}
-              leverage={position.leverage}
-              entryPrice={position.entryPrice}
-              currentPrice={livePrice > 0 ? livePrice : position.entryPrice}
-              positionSize={position.positionSize}
-              margin={position.margin}
-              estLiqPrice={position.estLiqPrice}
-              tpPrice={position.tpPrice}
-              slPrice={position.slPrice}
-              onAdjustMargin={() => setShowMarginSheet(true)}
-              onEditTpSl={() => setShowTpSlSheet(true)}
-              onAdjustLeverage={() => setShowLeverageSheet(true)}
-            />
+            {variant === "B" ? (
+              <PositionCardB
+                assetTicker="BTC"
+                side={position.side}
+                leverage={position.leverage}
+                entryPrice={position.entryPrice}
+                currentPrice={livePrice > 0 ? livePrice : position.entryPrice}
+                positionSize={position.positionSize}
+                margin={position.margin}
+                estLiqPrice={position.estLiqPrice}
+                tpPrice={position.tpPrice}
+                slPrice={position.slPrice}
+                onAdjustMargin={() => setShowMarginSheet(true)}
+                onEditTpSl={() => setShowTpSlSheet(true)}
+                onAdjustLeverage={() => setShowLeverageSheet(true)}
+              />
+            ) : (
+              <PositionCard
+                assetTicker="BTC"
+                side={position.side}
+                leverage={position.leverage}
+                entryPrice={position.entryPrice}
+                currentPrice={livePrice > 0 ? livePrice : position.entryPrice}
+                positionSize={position.positionSize}
+                margin={position.margin}
+                estLiqPrice={position.estLiqPrice}
+                tpPrice={position.tpPrice}
+                slPrice={position.slPrice}
+                onAdjustMargin={() => setShowMarginSheet(true)}
+                onEditTpSl={() => setShowTpSlSheet(true)}
+                onAdjustLeverage={() => setShowLeverageSheet(true)}
+              />
+            )}
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center gap-[8px] py-[32px]">
@@ -427,35 +490,82 @@ export default function InitialScreen() {
       </div>
 
       {/* Bottom Navigation */}
-      <div
-        className="shrink-0 flex flex-col items-center pt-[8px] border-t border-[rgba(2,2,3,0.1)]"
-        style={{ backgroundColor: "rgba(255,255,255,0.96)" }}
-      >
+      <div className="shrink-0 flex flex-col items-center pt-[8px] border-t-[0.5px] border-[rgba(2,2,3,0.1)] bg-[rgba(255,255,255,0.96)]">
         <div className="flex items-start justify-between w-full px-[8px]">
-          {[
-            { label: "Home", icon: <IconHome /> },
-            { label: "Market", icon: <IconMarket /> },
-            { label: "Trade", icon: <IconTrade /> },
-            { label: "Futures", icon: <IconFutures active />, active: true },
-            { label: "Wallet", icon: <IconWallet /> },
-          ].map(({ label, icon, active }) => (
-            <div key={label} className="flex flex-col gap-[4px] items-center justify-center w-[58px] overflow-hidden px-[16px]">
-              <div className="w-[24px] h-[24px] flex items-center justify-center">{icon}</div>
-              <span className={`text-[10px] leading-[14px] text-center whitespace-nowrap ${active ? "font-['Inter',sans-serif] font-semibold text-[#020203]" : "font-['Inter',sans-serif] font-normal text-[#020203]"}`}>
-                {label}
-              </span>
+          {/* Home */}
+          <button className="flex flex-col gap-[4px] items-center justify-center overflow-clip px-[16px] w-[58px]" onClick={onNavigateHome}>
+            <div className="overflow-clip relative shrink-0 size-[24px]">
+              <div className="absolute inset-[12.36%_12.5%_12.5%_12.5%]">
+                <img alt="" className="absolute block max-w-none size-full" src={imgNavHome} />
+              </div>
             </div>
-          ))}
+            <span className="font-['Inter',sans-serif] font-normal text-[10px] leading-[14px] text-center text-[#020203] whitespace-nowrap">Home</span>
+          </button>
+          {/* Market */}
+          <button className="flex flex-col gap-[4px] items-center justify-center overflow-clip px-[16px] w-[58px]">
+            <div className="overflow-clip relative shrink-0 size-[24px]">
+              <div className="absolute inset-[8.33%]">
+                <img alt="" className="absolute block max-w-none size-full" src={imgNavMarkets} />
+              </div>
+            </div>
+            <span className="font-['Inter',sans-serif] font-normal text-[10px] leading-[14px] text-center text-[#020203] whitespace-nowrap">Market</span>
+          </button>
+          {/* Trade */}
+          <button className="flex flex-col gap-[4px] items-center justify-center overflow-clip px-[16px] w-[58px]">
+            <div className="relative shrink-0 size-[24px]">
+              <div className="absolute inset-[8.33%]">
+                <img alt="" className="absolute block max-w-none size-full" src={imgNavTrade} />
+              </div>
+            </div>
+            <span className="font-['Inter',sans-serif] font-normal text-[10px] leading-[14px] text-center text-[#020203] whitespace-nowrap">Trade</span>
+          </button>
+          {/* Futures (active) */}
+          <button className="flex flex-col gap-[4px] items-center justify-center overflow-clip px-[16px] w-[58px]">
+            <div className="overflow-clip relative shrink-0 size-[24px]">
+              <div className="absolute inset-[12.5%]">
+                <img alt="" className="absolute block max-w-none size-full" src={imgNavFutures} />
+              </div>
+            </div>
+            <span className="font-['Inter',sans-serif] font-semibold text-[10px] leading-[14px] text-center text-[#020203] whitespace-nowrap">Futures</span>
+          </button>
+          {/* Wallet */}
+          <button className="flex flex-col gap-[4px] items-center justify-center overflow-clip px-[16px] w-[58px]">
+            <div className="overflow-clip relative shrink-0 size-[24px]">
+              <div className="absolute inset-[12.5%]">
+                <img alt="" className="absolute block max-w-none size-full" src={imgNavWallet} />
+              </div>
+            </div>
+            <span className="font-['Inter',sans-serif] font-normal text-[10px] leading-[14px] text-center text-[#020203] whitespace-nowrap">Wallet</span>
+          </button>
         </div>
-        <div className="h-[34px] flex items-end justify-center pb-2">
-          <div className="w-[134px] h-[5px] rounded-full bg-[#020203]" />
-        </div>
+        <div className="w-[134px] h-[5px] rounded-full bg-[#020203] my-[8px]" />
       </div>
+
+      {/* Transfer Sheet — full screen, top-level so it covers everything */}
+      {showTransferSheet && (
+        <div className="absolute inset-0 z-40">
+          <TransferSheet
+            onConfirm={(transferred) => {
+              const prev = parseFloat(currentMargin) || 0;
+              setCurrentMargin(String(prev + transferred));
+              setShowTransferSheet(false);
+            }}
+            onClose={() => setShowTransferSheet(false)}
+          />
+        </div>
+      )}
 
       {/* Order Sheet overlay */}
       {openSheet && (
         <div className="absolute inset-0 z-10">
-          <div className="absolute inset-0 bg-black/70" onClick={() => setOpenSheet(null)} />
+          <div className="absolute inset-0 bg-black/70" onClick={() => {
+            setOpenSheet(null);
+            setOrderLeverage(25);
+            setOrderTpPrice(undefined);
+            setOrderSlPrice(undefined);
+            setOrderTpEnabled(undefined);
+            setOrderSlEnabled(undefined);
+          }} />
           <div className="absolute inset-0 flex items-end pointer-events-none">
             <div className="pointer-events-auto w-full">
               <OrderTypeSheet
@@ -463,22 +573,66 @@ export default function InitialScreen() {
                 assetTicker="BTC"
                 price={livePriceForSheet}
                 initialLeverage={25}
-                availableMargin="300"
+                availableMargin={currentMargin}
                 onConfirm={(pos) => handleOrderConfirm(pos)}
-                onClose={() => setOpenSheet(null)}
+                onClose={() => {
+                  setOpenSheet(null);
+                  setOrderLeverage(25);
+                  setOrderTpPrice(undefined);
+                  setOrderSlPrice(undefined);
+                  setOrderTpEnabled(undefined);
+                  setOrderSlEnabled(undefined);
+                }}
+                onOpenTransfer={() => setShowTransferSheet(true)}
+                leverage={orderLeverage}
+                tpPrice={orderTpPrice}
+                slPrice={orderSlPrice}
+                tpEnabled={orderTpEnabled}
+                slEnabled={orderSlEnabled}
+                onOpenConfirmation={(pos) => {
+                  setPendingPos(pos);
+                  setShowOrderConfirmation(true);
+                }}
+                onOpenLeverage={(leverage, margin, entryPrice) => {
+                  setOrderLeverageInit({ leverage, margin, entryPrice });
+                  setShowOrderLeverage(true);
+                }}
+                onOpenTpSl={(tpPrice, slPrice, tpEnabled, slEnabled, positionSize, leverage, estLiqPrice) => {
+                  setOrderTpSlInit({ tpPrice, slPrice, tpEnabled, slEnabled, positionSize, leverage, estLiqPrice });
+                  setShowOrderTpSl(true);
+                }}
               />
             </div>
           </div>
         </div>
       )}
 
-      {/* Coachmark overlay */}
-      {coachmarkStep !== null && position && (
+      {/* Coachmark overlay — variant A */}
+      {variant === "A" && coachmarkStep !== null && position && (
         <CoachmarkOverlay
           step={coachmarkStep}
           scrollContainerRef={scrollRef}
-          onNext={handleCoachmarkNext}
-          onDone={handleCoachmarkDone}
+          onNext={() => {
+            if (coachmarkStep === 1) setCoachmarkStep(2);
+            else if (coachmarkStep === 2) setCoachmarkStep(3);
+          }}
+          onDone={() => {
+            setCoachmarkStep(null);
+            setHasSeenCoachmark(true);
+          }}
+        />
+      )}
+
+      {/* Coachmark overlay — variant B */}
+      {variant === "B" && coachmarkStepB !== null && position && (
+        <CoachmarkOverlayB
+          step={coachmarkStepB}
+          scrollContainerRef={scrollRef}
+          onNext={() => setCoachmarkStepB(2)}
+          onDone={() => {
+            setCoachmarkStepB(null);
+            setHasSeenCoachmark(true);
+          }}
         />
       )}
 
@@ -539,6 +693,87 @@ export default function InitialScreen() {
                 entryPrice={position.entryPrice}
                 onConfirm={handleLeverageConfirm}
                 onClose={() => setShowLeverageSheet(false)}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Order Sheet — Leverage overlay (full-frame) */}
+      {showOrderLeverage && orderLeverageInit && (
+        <div className="absolute inset-0 z-20">
+          <div className="absolute inset-0 bg-black/70" onClick={() => setShowOrderLeverage(false)} />
+          <div className="absolute inset-0 flex items-end pointer-events-none">
+            <div className="pointer-events-auto w-full">
+              <LeverageSheet
+                initialLeverage={orderLeverageInit.leverage}
+                margin={orderLeverageInit.margin}
+                entryPrice={orderLeverageInit.entryPrice}
+                onConfirm={(lev) => {
+                  setOrderLeverage(lev);
+                  setShowOrderLeverage(false);
+                }}
+                onClose={() => setShowOrderLeverage(false)}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Order Sheet — TpSl overlay (full-frame) */}
+      {showOrderTpSl && orderTpSlInit && openSheet && (
+        <div className="absolute inset-0 z-20">
+          <div className="absolute inset-0 bg-black/70" onClick={() => setShowOrderTpSl(false)} />
+          <div className="absolute inset-0 flex items-end pointer-events-none">
+            <div className="pointer-events-auto w-full">
+              <TpSlSheet
+                side={openSheet}
+                entryPrice={parseFloat(livePriceForSheet.replace(/\./g, "").replace(",", ".")) || 0}
+                positionSize={orderTpSlInit.positionSize}
+                leverage={orderTpSlInit.leverage}
+                tpPrice={orderTpSlInit.tpPrice}
+                slPrice={orderTpSlInit.slPrice}
+                tpEnabled={orderTpSlInit.tpEnabled}
+                slEnabled={orderTpSlInit.slEnabled}
+                estLiqPrice={orderTpSlInit.estLiqPrice}
+                onConfirm={(tpPrice, slPrice) => {
+                  setOrderTpPrice(tpPrice > 0 ? tpPrice : undefined);
+                  setOrderSlPrice(slPrice > 0 ? slPrice : undefined);
+                  setOrderTpEnabled(tpPrice > 0);
+                  setOrderSlEnabled(slPrice > 0);
+                  setShowOrderTpSl(false);
+                }}
+                onClose={() => setShowOrderTpSl(false)}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Order Sheet — Confirmation overlay (full-frame) */}
+      {showOrderConfirmation && pendingPos && (
+        <div className="absolute inset-0 z-20">
+          <div className="absolute inset-0 bg-black/70" onClick={() => setShowOrderConfirmation(false)} />
+          <div className="absolute inset-0 flex items-end pointer-events-none">
+            <div className="pointer-events-auto w-full">
+              <ConfirmationSheet
+                side={pendingPos.side}
+                assetTicker="BTC"
+                leverage={pendingPos.leverage}
+                margin={pendingPos.margin}
+                price={livePriceForSheet}
+                estLiqPrice={pendingPos.estLiqPrice}
+                onConfirm={() => {
+                  setShowOrderConfirmation(false);
+                  handleOrderConfirm(pendingPos);
+                  setOpenSheet(null);
+                  setOrderLeverage(25);
+                  setOrderTpPrice(undefined);
+                  setOrderSlPrice(undefined);
+                  setOrderTpEnabled(undefined);
+                  setOrderSlEnabled(undefined);
+                }}
+                onClose={() => setShowOrderConfirmation(false)}
               />
             </div>
           </div>
