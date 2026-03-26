@@ -424,11 +424,17 @@ export default function InitialScreen({ onNavigateHome, variant = "A" }: Initial
         {!position && (
         <div className="px-[16px] py-[16px] flex gap-[16px]">
           <button onClick={() => setOpenSheet("Long")} className="flex-1 h-[52px] bg-[#25a764] rounded-[8px] flex flex-col gap-[2px] items-center justify-center overflow-hidden hover:opacity-90 transition-opacity">
-            <span className="font-['Inter',sans-serif] font-semibold text-[14px] leading-[20px] text-white">↗ Long</span>
+            <div className="flex items-center gap-[4px]">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 10L10 2M10 2H4M10 2v6" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              <span className="font-['Inter',sans-serif] font-semibold text-[14px] leading-[20px] text-white">Long</span>
+            </div>
             <span className="font-['Inter',sans-serif] text-[10px] leading-[14px] text-white text-center px-[8px]">Profit when price goes up</span>
           </button>
           <button onClick={() => setOpenSheet("Short")} className="flex-1 h-[52px] bg-[#e54040] rounded-[8px] flex flex-col gap-[2px] items-center justify-center overflow-hidden hover:opacity-90 transition-opacity">
-            <span className="font-['Inter',sans-serif] font-semibold text-[14px] leading-[20px] text-white">↘ Short</span>
+            <div className="flex items-center gap-[4px]">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 2L10 10M10 10H4M10 10V4" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              <span className="font-['Inter',sans-serif] font-semibold text-[14px] leading-[20px] text-white">Short</span>
+            </div>
             <span className="font-['Inter',sans-serif] text-[10px] leading-[14px] text-white text-center px-[8px]">Profit when price goes down</span>
           </button>
         </div>

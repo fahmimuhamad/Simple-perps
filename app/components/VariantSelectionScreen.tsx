@@ -31,7 +31,7 @@ export default function VariantSelectionScreen({ onSelect }: VariantSelectionScr
         {/* Option A */}
         <button
           onClick={() => onSelect("A")}
-          className="w-full border border-[rgba(2,2,3,0.1)] rounded-[12px] p-[16px] flex flex-col gap-[6px] items-start text-left hover:bg-[#fafafa] active:bg-[#f2f2f2] transition-colors"
+          className="w-full border border-[rgba(2,2,3,0.1)] rounded-[12px] p-[16px] flex flex-col items-start text-left hover:bg-[#fafafa] active:bg-[#f2f2f2] transition-colors"
         >
           <div className="flex items-center gap-[8px]">
             <div className="w-[28px] h-[28px] rounded-full bg-[#0a68f4] flex items-center justify-center shrink-0">
@@ -41,15 +41,12 @@ export default function VariantSelectionScreen({ onSelect }: VariantSelectionScr
               Option A — Current Flow
             </span>
           </div>
-          <p className="font-['Inter',sans-serif] text-[12px] leading-[16px] text-[#626363] pl-[36px]">
-            Standard position card with entry price, liquidation price, and 3-step coachmark.
-          </p>
         </button>
 
         {/* Option B */}
         <button
           onClick={() => onSelect("B")}
-          className="w-full border border-[rgba(2,2,3,0.1)] rounded-[12px] p-[16px] flex flex-col gap-[6px] items-start text-left hover:bg-[#fafafa] active:bg-[#f2f2f2] transition-colors"
+          className="w-full border border-[rgba(2,2,3,0.1)] rounded-[12px] p-[16px] flex flex-col items-start text-left hover:bg-[#fafafa] active:bg-[#f2f2f2] transition-colors"
         >
           <div className="flex items-center gap-[8px]">
             <div className="w-[28px] h-[28px] rounded-full bg-[#25a764] flex items-center justify-center shrink-0">
@@ -59,9 +56,6 @@ export default function VariantSelectionScreen({ onSelect }: VariantSelectionScr
               Option B — Simplified View
             </span>
           </div>
-          <p className="font-['Inter',sans-serif] text-[12px] leading-[16px] text-[#626363] pl-[36px]">
-            Streamlined position card with prominent P&L display, and 2-step coachmark focused on position monitoring.
-          </p>
         </button>
       </div>
     </div>

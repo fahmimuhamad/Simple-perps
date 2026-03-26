@@ -154,15 +154,6 @@ export default function TransferSheet({ available = AVAILABLE, onConfirm, onClos
 
       {/* Navigation Bar */}
       <div className="bg-white flex flex-col shrink-0 pb-[4px]">
-        {/* Status bar */}
-        <div className="h-[44px] w-full flex items-center justify-between px-[16px]">
-          <span className="text-[#020203] text-[12px]" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}>9:41</span>
-          <div className="flex gap-[6px] items-center">
-            <svg width="18" height="12" viewBox="0 0 18 12" fill="#020203"><rect x="0" y="4" width="3" height="8" rx="1"/><rect x="4" y="2" width="3" height="10" rx="1"/><rect x="8" y="0" width="3" height="12" rx="1"/><rect x="12" y="0" width="3" height="12" rx="1" opacity="0.3"/></svg>
-            <svg width="16" height="12" viewBox="0 0 16 12" fill="#020203"><path d="M8 2.4C10.2 2.4 12.2 3.3 13.6 4.8L15 3.4C13.2 1.3 10.7 0 8 0S2.8 1.3 1 3.4l1.4 1.4C3.8 3.3 5.8 2.4 8 2.4z"/><path d="M8 5.6c1.4 0 2.6.6 3.5 1.5L13 5.6C11.7 4.1 9.9 3.2 8 3.2S4.3 4.1 3 5.6l1.5 1.5C5.4 6.2 6.6 5.6 8 5.6z"/><circle cx="8" cy="10" r="2"/></svg>
-            <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#020203" strokeOpacity="0.35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#020203"/><path d="M23 4v4a2 2 0 000-4z" fill="#020203" fillOpacity="0.4"/></svg>
-          </div>
-        </div>
         {/* Nav row */}
         <div className="relative flex h-[38px] items-center w-full px-[8px]">
           <button onClick={onClose} className="size-[32px] flex items-center justify-center">
