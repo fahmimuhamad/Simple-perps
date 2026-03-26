@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useBinancePrice } from "../hooks/useBinancePrice";
+
+const USDT_TO_IDR = 15382;
 
 // ── Bottom Nav Icon assets (from Figma) ─────────────────────────────────────
 const imgNavHome    = "https://www.figma.com/api/mcp/asset/9c02c2e8-1ffe-47dc-b18d-d27412b070e5"; // Home Filled
@@ -197,6 +200,24 @@ interface HomeScreenProps {
 export default function HomeScreen({ onNavigateFutures }: HomeScreenProps) {
   const [activeTab, setActiveTab] = useState<"home" | "markets" | "trade" | "futures" | "wallet">("home");
   const [promoPage, setPromoPage] = useState(0);
+  const btcTicker = useBinancePrice("BTCUSDT");
+  const ethTicker = useBinancePrice("ETHUSDT");
+  const solTicker = useBinancePrice("SOLUSDT");
+
+  // Prices in IDR
+  const btcIdr = (btcTicker?.price ?? 0) * USDT_TO_IDR;
+  const ethIdr = (ethTicker?.price ?? 0) * USDT_TO_IDR;
+  const solIdr = (solTicker?.price ?? 0) * USDT_TO_IDR;
+
+  function formatIdr(n: number): string {
+    if (!n) return "—";
+    return n.toLocaleString("id-ID", { maximumFractionDigits: 0 });
+  }
+
+  function formatPct(n: number): string {
+    const sign = n >= 0 ? "+" : "";
+    return `${sign}${n.toFixed(2)}%`;
+  }
 
   function handleTabPress(tab: typeof activeTab) {
     setActiveTab(tab);
@@ -206,8 +227,11 @@ export default function HomeScreen({ onNavigateFutures }: HomeScreenProps) {
   return (
     <div className="bg-white w-full h-full flex flex-col relative">
 
-      {/* ── Fixed header (dark) ─────────────────────────────── */}
-      <div className="bg-[#020203] flex flex-col shrink-0">
+      {/* ── Scrollable content (header scrolls with it) ─────── */}
+      <div className="flex-1 overflow-y-auto pb-[80px]">
+
+      {/* ── Dark header ─────────────────────────────── */}
+      <div className="bg-[#020203] flex flex-col shrink-0 pt-[44px]">
 
         {/* Nav row */}
         <div className="flex h-[32px] items-center justify-between px-[16px] mb-[16px]">
@@ -259,9 +283,6 @@ export default function HomeScreen({ onNavigateFutures }: HomeScreenProps) {
           ))}
         </div>
       </div>
-
-      {/* ── Scrollable content ──────────────────────────────── */}
-      <div className="flex-1 overflow-y-auto pb-[80px]">
 
         {/* Promo carousel */}
         <div className="bg-[#fafafa] pt-[16px] pb-[8px] pl-[16px]">
@@ -355,9 +376,9 @@ export default function HomeScreen({ onNavigateFutures }: HomeScreenProps) {
 
           {/* Coin rows */}
           <div className="flex flex-col">
-            <CoinListRow icon={<BtcIcon />} symbol="BTC" volume="Vol. 92M" price="399.585.000" change="+2,2%" positive={true} />
-            <CoinListRow icon={<EthIcon />} symbol="ETH" volume="Vol. 92M" price="27.138.200" change="-0,42%" positive={false} />
-            <CoinListRow icon={<SolIcon />} symbol="SOL" volume="Vol. 92M" price="4.605.400" change="+1,24%" positive={true} />
+            <CoinListRow icon={<BtcIcon />} symbol="BTC" volume="Vol. 92M" price={btcIdr ? formatIdr(btcIdr) : "—"} change={btcTicker ? formatPct(btcTicker.changePct) : "—"} positive={(btcTicker?.changePct ?? 0) >= 0} />
+            <CoinListRow icon={<EthIcon />} symbol="ETH" volume="Vol. 92M" price={ethIdr ? formatIdr(ethIdr) : "—"} change={ethTicker ? formatPct(ethTicker.changePct) : "—"} positive={(ethTicker?.changePct ?? 0) >= 0} />
+            <CoinListRow icon={<SolIcon />} symbol="SOL" volume="Vol. 92M" price={solIdr ? formatIdr(solIdr) : "—"} change={solTicker ? formatPct(solTicker.changePct) : "—"} positive={(solTicker?.changePct ?? 0) >= 0} />
             <CoinListRow icon={<PtuIcon />} symbol="PTU" volume="Vol. 92M" price="5.400" change="+1,24%" positive={true} />
           </div>
 
