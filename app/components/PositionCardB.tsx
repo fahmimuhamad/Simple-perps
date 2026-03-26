@@ -2,7 +2,6 @@
 
 // Asset URLs from Figma
 const imgUnion = "https://www.figma.com/api/mcp/asset/d2e15b2c-cb20-4812-a6c2-a7827c08897d";
-const imgShape11 = "https://www.figma.com/api/mcp/asset/20bd9830-bea2-4688-8618-7e5343db9152";
 
 type Side = "Long" | "Short";
 
@@ -14,6 +13,7 @@ interface PositionCardBProps {
   currentPrice: number;
   positionSize: number;
   margin: number;
+  tpPrice: number;
   slPrice: number;
   onAdjustMargin?: () => void;
   onEditTpSl?: () => void;
@@ -33,6 +33,7 @@ export default function PositionCardB({
   currentPrice,
   positionSize,
   margin,
+  tpPrice,
   slPrice,
   onAdjustMargin,
   onEditTpSl,
@@ -51,6 +52,7 @@ export default function PositionCardB({
   const pnlTextColor = pnlPositive ? "#25a764" : "#e54040";
   const pnlSign = pnl >= 0 ? "+" : "-";
 
+  const tpDisplay = tpPrice > 0 ? formatEuropean(tpPrice, 1) : "-";
   const slDisplay = slPrice > 0 ? formatEuropean(slPrice, 1) : "—";
 
   return (
@@ -143,22 +145,20 @@ export default function PositionCardB({
         <div className="bg-[#fafafa] flex flex-col items-start p-[8px] rounded-[8px] w-full">
           <div className="flex items-center justify-between w-full">
             <span className="font-['Inter',sans-serif] text-[10px] leading-[14px] text-[#626363]">
-              SL
+              TP/SL
             </span>
             <div className="flex items-center gap-[2px]">
+              <span className="font-['Inter',sans-serif] font-semibold text-[12px] leading-[16px] text-[#25a764]">
+                {tpDisplay}
+              </span>
+              <span className="font-['Inter',sans-serif] text-[10px] leading-[14px] text-[#8d8e8e]">/</span>
               <span className="font-['Inter',sans-serif] font-semibold text-[12px] leading-[16px] text-[#626363]">
                 {slDisplay}
               </span>
-              <button className="w-[14px] h-[14px] flex items-center justify-center ml-[2px]" onClick={onEditTpSl}>
-                <div className="relative size-[14px]">
-                  <div className="absolute flex inset-[1.87%_1.85%_2.34%_2.37%] items-center justify-center">
-                    <div className="flex-none rotate-45" style={{ height: "24.509px", width: "8px" }}>
-                      <div className="relative size-full">
-                        <img alt="" className="absolute block max-w-none size-full" src={imgShape11} />
-                      </div>
-                    </div>
-                  </div>
-                </div>
+              <button className="w-[14px] h-[14px] flex items-center justify-center ml-[2px] overflow-hidden" onClick={onEditTpSl}>
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <path d="M9.5 2.5l2 2L4 12H2v-2L9.5 2.5z" stroke="#0a68f4" strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
               </button>
             </div>
           </div>

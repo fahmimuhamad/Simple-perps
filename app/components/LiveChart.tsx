@@ -9,10 +9,11 @@ interface LiveChartProps {
   width?: number;
   height?: number;
   entryPrice?: number;
+  tpPrice?: number;
   slPrice?: number;
 }
 
-export default function LiveChart({ klines, chartType = "line", width = 375, height = 260, entryPrice, slPrice }: LiveChartProps) {
+export default function LiveChart({ klines, chartType = "line", width = 375, height = 260, entryPrice, tpPrice, slPrice }: LiveChartProps) {
   const [visibleCount, setVisibleCount] = useState(80);
   const [offsetRight, setOffsetRight] = useState(0);
   const [containerWidth, setContainerWidth] = useState(width);
@@ -278,6 +279,28 @@ export default function LiveChart({ klines, chartType = "line", width = 375, hei
             <div className="flex-1 h-px border-0 border-t border-dashed border-[rgba(2,2,3,0.3)]" />
             <div className="bg-white border border-[rgba(2,2,3,0.1)] rounded-[4px] px-[4px] flex items-center justify-center shrink-0" style={{ height: 16 }}>
               <span style={{ fontFamily: "Inter, sans-serif", fontSize: 10, lineHeight: "14px", color: "#020203", whiteSpace: "nowrap" }}>{label}</span>
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* TP price line */}
+      {tpPrice && (() => {
+        const rawY = toY(tpPrice);
+        const clampedY = Math.max(paddingTop, Math.min(paddingTop + chartHeight, rawY));
+        const yPct = (clampedY / height) * 100;
+        const label = tpPrice.toLocaleString("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+        return (
+          <div
+            className="absolute inset-x-0 flex items-center pointer-events-none gap-px"
+            style={{ top: `${yPct}%`, transform: "translateY(-50%)", paddingLeft: paddingLeft, paddingRight: paddingRight }}
+          >
+            <div className="bg-white border border-[#25a764] rounded-[4px] px-[4px] flex items-center justify-center shrink-0" style={{ height: 16 }}>
+              <span style={{ fontFamily: "Inter, sans-serif", fontSize: 10, lineHeight: "14px", color: "#25a764", whiteSpace: "nowrap" }}>TP</span>
+            </div>
+            <div className="flex-1 h-px border-0 border-t border-dashed border-[#25a764]" />
+            <div className="bg-white border border-[#25a764] rounded-[4px] px-[4px] flex items-center justify-center shrink-0" style={{ height: 16 }}>
+              <span style={{ fontFamily: "Inter, sans-serif", fontSize: 10, lineHeight: "14px", color: "#25a764", whiteSpace: "nowrap" }}>{label}</span>
             </div>
           </div>
         );

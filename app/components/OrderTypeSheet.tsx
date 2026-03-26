@@ -272,7 +272,7 @@ export default function OrderTypeSheet({
               if (availBal === 0 || margin > availBal) {
                 setShowInsufficientMargin(true);
               } else {
-                onOpenConfirmation?.({ side, leverage, positionSize, margin, entryPrice, tpPrice, slPrice, estLiqPrice });
+                onOpenConfirmation?.({ side, leverage, positionSize, margin, entryPrice, tpPrice: tpEnabled ? tpPrice : 0, slPrice: slEnabled ? slPrice : 0, estLiqPrice });
               }
             }}
             disabled={margin === 0}

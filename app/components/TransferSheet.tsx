@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import TransferConfirmationSheet from "./TransferConfirmationSheet";
 import TransferSuccessScreen from "./TransferSuccessScreen";
 
 const AVAILABLE = 300;
@@ -96,7 +95,6 @@ function UsdtIcon() {
 export default function TransferSheet({ available = AVAILABLE, onConfirm, onClose }: TransferSheetProps) {
   const [amount, setAmount] = useState("0");
   const [showBanner, setShowBanner] = useState(true);
-  const [showConfirmation, setShowConfirmation] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
   const numericAmount = parseFloat(amount) || 0;
@@ -121,7 +119,7 @@ export default function TransferSheet({ available = AVAILABLE, onConfirm, onClos
 
   function handleTransfer() {
     if (!canTransfer) return;
-    setShowConfirmation(true);
+    setShowSuccess(true);
   }
 
   return (
@@ -137,18 +135,6 @@ export default function TransferSheet({ available = AVAILABLE, onConfirm, onClos
             onConfirm?.(numericAmount);
             onClose();
           }}
-        />
-      )}
-      {showConfirmation && !showSuccess && (
-        <TransferConfirmationSheet
-          idrAmount={numericAmount * USDT_TO_IDR_RATE}
-          usdtAmount={numericAmount}
-          estRate={USDT_TO_IDR_RATE}
-          onConfirm={() => {
-            setShowConfirmation(false);
-            setShowSuccess(true);
-          }}
-          onCancel={() => setShowConfirmation(false)}
         />
       )}
 

@@ -20,8 +20,7 @@ export default function Home() {
   }
 
   function handleNavigateFutures() {
-    if (variant === "A" && !onboardingDone) {
-      // Show InitialScreen behind, then overlay onboarding on top
+    if (!onboardingDone) {
       setScreen("futures");
       setShowOnboarding(true);
     } else {

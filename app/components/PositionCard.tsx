@@ -222,7 +222,7 @@ export default function PositionCard({
               {/* Edit pencil icon */}
               <button className="w-[14px] h-[14px] flex items-center justify-center ml-[2px]" onClick={onEditTpSl}>
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                  <path d="M9.5 2.5l2 2L4 12H2v-2L9.5 2.5z" stroke="#020203" strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M9.5 2.5l2 2L4 12H2v-2L9.5 2.5z" stroke="#0a68f4" strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </button>
             </div>

@@ -185,18 +185,18 @@ export default function TpSlSheet({
         {/* Header row */}
         <div className="flex items-center gap-[6px]">
           <Checkbox checked={tpEnabled} onChange={() => setTpEnabled((v) => !v)} />
-          <span className="text-[12px] leading-[16px] text-[#0b0a0a]" style={{ fontFamily: "'Inter', sans-serif" }}>
-            {mode === "PnL" ? "Take Profit PnL (TP)" : "Take Profit Price (TP)"}
+          <span className="text-[12px] leading-[16px] text-[#020203]" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}>
+            Take Profit (TP)
           </span>
         </div>
 
         {/* Input */}
         <div
           className="bg-white rounded-[6px] h-[32px] flex items-center px-[8px]"
-          style={{ border: inputBorder(false) }}
+          style={{ border: inputBorder(false), opacity: tpEnabled ? 1 : 0.4 }}
         >
           <input
-            type="number"
+            type={tpEnabled && (mode === "PnL" ? tpPnlInput : tpPriceInput) ? "number" : "text"}
             inputMode="decimal"
             disabled={!tpEnabled}
             value={mode === "PnL" ? tpPnlInput : tpPriceInput}
@@ -204,10 +204,10 @@ export default function TpSlSheet({
               mode === "PnL" ? setTpPnlInput(e.target.value) : setTpPriceInput(e.target.value)
             }
             placeholder={tpEnabled ? (mode === "PnL" ? "Enter PnL amount" : "Enter price") : "—"}
-            className="flex-1 bg-transparent outline-none text-[12px] leading-[16px] text-[#020203] disabled:text-[#8d8e8e] placeholder:text-[#8d8e8e] placeholder:font-normal"
+            className="flex-1 bg-transparent outline-none text-[12px] leading-[16px] text-[#020203] placeholder:text-[#8d8e8e] placeholder:font-normal"
             style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}
           />
-          <span className="text-[12px] leading-[16px] text-[#626363] ml-[4px] shrink-0" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}>
+          <span className="text-[12px] leading-[16px] text-[#8d8e8e] ml-[4px] shrink-0" style={{ fontFamily: "'Inter', sans-serif" }}>
             USDT
           </span>
         </div>
@@ -219,7 +219,7 @@ export default function TpSlSheet({
               {mode === "PnL" ? "Estimated Price" : "Estimated Profit"}
             </span>
             <span
-              className="text-[14px] leading-[20px]"
+              className="text-[12px] leading-[16px]"
               style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600, color: "#25a764" }}
             >
               {mode === "PnL"
@@ -236,18 +236,18 @@ export default function TpSlSheet({
         {/* Header row */}
         <div className="flex items-center gap-[6px]">
           <Checkbox checked={slEnabled} onChange={() => setSlEnabled((v) => !v)} />
-          <span className="text-[12px] leading-[16px] text-[#0b0a0a]" style={{ fontFamily: "'Inter', sans-serif" }}>
-            Stop Loss Price (SL)
+          <span className="text-[12px] leading-[16px] text-[#020203]" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}>
+            Stop Loss (SL)
           </span>
         </div>
 
         {/* Input */}
         <div
           className="bg-white rounded-[6px] h-[32px] flex items-center px-[8px]"
-          style={{ border: inputBorder(slBelowLiq) }}
+          style={{ border: inputBorder(slBelowLiq), opacity: slEnabled ? 1 : 0.4 }}
         >
           <input
-            type="number"
+            type={slEnabled && (mode === "PnL" ? slPnlInput : slPriceInput) ? "number" : "text"}
             inputMode="decimal"
             disabled={!slEnabled}
             value={mode === "PnL" ? slPnlInput : slPriceInput}
@@ -255,10 +255,10 @@ export default function TpSlSheet({
               mode === "PnL" ? setSlPnlInput(e.target.value) : setSlPriceInput(e.target.value)
             }
             placeholder={slEnabled ? (mode === "PnL" ? "Enter loss amount" : "Enter price") : "—"}
-            className="flex-1 bg-transparent outline-none text-[12px] leading-[16px] text-[#020203] disabled:text-[#8d8e8e] placeholder:text-[#8d8e8e] placeholder:font-normal"
+            className="flex-1 bg-transparent outline-none text-[12px] leading-[16px] text-[#020203] placeholder:text-[#8d8e8e] placeholder:font-normal"
             style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}
           />
-          <span className="text-[12px] leading-[16px] text-[#626363] ml-[4px] shrink-0" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}>
+          <span className="text-[12px] leading-[16px] text-[#8d8e8e] ml-[4px] shrink-0" style={{ fontFamily: "'Inter', sans-serif" }}>
             USDT
           </span>
         </div>
@@ -277,8 +277,8 @@ export default function TpSlSheet({
               {mode === "PnL" ? "Estimated Price" : "Estimated Loss"}
             </span>
             <span
-              className="text-[14px] leading-[20px]"
-              style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600, color: "#020203" }}
+              className="text-[12px] leading-[16px]"
+              style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600, color: "#626363" }}
             >
               {mode === "PnL"
                 ? slTrigger > 0 ? formatPrice(slTrigger) : "—"

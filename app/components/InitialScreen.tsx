@@ -162,7 +162,7 @@ export default function InitialScreen({ onNavigateHome, variant = "A" }: Initial
   const [orderLeverage, setOrderLeverage] = useState(25);
   const [orderTpPrice, setOrderTpPrice] = useState<number | undefined>(undefined);
   const [orderSlPrice, setOrderSlPrice] = useState<number | undefined>(undefined);
-  const [orderTpEnabled, setOrderTpEnabled] = useState<boolean | undefined>(undefined);
+  const [orderTpEnabled, setOrderTpEnabled] = useState<boolean | undefined>(variant === "B" ? false : undefined);
   const [orderSlEnabled, setOrderSlEnabled] = useState<boolean | undefined>(undefined);
 
   // Live Binance data
@@ -324,6 +324,7 @@ export default function InitialScreen({ onNavigateHome, variant = "A" }: Initial
           klines={klines}
           chartType={chartType}
           entryPrice={variant === "B" && position ? position.entryPrice : undefined}
+          tpPrice={variant === "B" && position && position.tpPrice > 0 ? position.tpPrice : undefined}
           slPrice={variant === "B" && position ? position.slPrice : undefined}
         />
 
@@ -438,6 +439,7 @@ export default function InitialScreen({ onNavigateHome, variant = "A" }: Initial
                 currentPrice={livePrice > 0 ? livePrice : position.entryPrice}
                 positionSize={position.positionSize}
                 margin={position.margin}
+                tpPrice={position.tpPrice}
                 slPrice={position.slPrice}
                 onAdjustMargin={() => setShowMarginSheet(true)}
                 onEditTpSl={() => setShowTpSlSheet(true)}

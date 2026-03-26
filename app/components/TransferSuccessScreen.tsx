@@ -1,148 +1,130 @@
 "use client";
 
-const USDT_TO_IDR_RATE = 15382; // 1 USDT ≈ IDR 15,382
-
-// Check circle icons (from Figma)
-const imgCheckFill  = "https://www.figma.com/api/mcp/asset/68a93d4c-3820-4b95-aed5-0613b7d403ad";
-const imgCheckMark  = "https://www.figma.com/api/mcp/asset/9b1ec308-cec9-4f37-ae78-3f0aebcb18f0";
+const imgRectangle328 = "https://www.figma.com/api/mcp/asset/01c55705-1a69-45e5-92e3-3bf837317cfd";
+const imgRectangle329 = "https://www.figma.com/api/mcp/asset/fabc7582-5c22-4a9e-8b63-5cc1fc54e57b";
+const imgGroup = "https://www.figma.com/api/mcp/asset/3482ad3f-2bd5-4905-8e39-40745f491338";
+const imgEllipse261 = "https://www.figma.com/api/mcp/asset/7195cca0-3d20-44fa-a99f-08398d6ca770";
+const imgEllipse260 = "https://www.figma.com/api/mcp/asset/06e51076-b243-40e7-b0c2-7f7e226bbf61";
+const imgIcons24Switch = "https://www.figma.com/api/mcp/asset/05297446-982d-4457-aabc-758d58fd68d2";
 
 interface TransferSuccessScreenProps {
-  /** USDT amount transferred */
   usdtAmount: number;
   onOk: () => void;
   onTrade: () => void;
 }
 
-function CheckCircleIcon() {
-  return (
-    <div className="relative size-[20px]">
-      <div className="absolute inset-[8.33%]">
-        <img alt="" className="absolute block max-w-none size-full" src={imgCheckFill} />
-      </div>
-      <div className="absolute bottom-[29.17%] left-1/4 right-1/4 top-[33.33%]">
-        <img alt="" className="absolute block max-w-none size-full" src={imgCheckMark} />
-      </div>
-    </div>
-  );
-}
-
-function SuccessIcon() {
-  return (
-    <div className="relative" style={{ width: 160, height: 160 }}>
-      {/* Outer glow rings */}
-      <div className="absolute inset-0 rounded-full" style={{ background: "radial-gradient(circle, rgba(15,123,255,0.15) 0%, transparent 70%)" }} />
-      {/* Blue circle */}
-      <div className="absolute inset-[19%] rounded-full bg-[#0f7bff] flex items-center justify-center shadow-lg">
-        {/* Checkmark SVG */}
-        <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-          <path d="M13 25l8 8 14-16" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      </div>
-    </div>
-  );
-}
-
 export default function TransferSuccessScreen({ usdtAmount, onOk, onTrade }: TransferSuccessScreenProps) {
-  const idrAmount    = Math.round(usdtAmount * USDT_TO_IDR_RATE);
-  const fee          = (usdtAmount * 0.025).toFixed(3); // mock 2.5% fee
-  const received     = (usdtAmount - parseFloat(fee)).toFixed(2);
-
-  const idrFormatted = idrAmount.toLocaleString("id-ID");
-  const usdtReceived = parseFloat(received).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  const usdtFee      = parseFloat(fee).toLocaleString("en-US", { minimumFractionDigits: 3, maximumFractionDigits: 3 });
+  const usdtFormatted = usdtAmount.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
 
   return (
-    <div
-      className="absolute inset-0 z-50 w-full flex flex-col overflow-hidden"
-      style={{ background: "linear-gradient(180deg, #0a1628 0%, #020303 60%)" }}
-    >
+    <div className="absolute inset-0 z-50 w-full h-full overflow-hidden" style={{ background: "#020303" }}>
+      {/* Background layers */}
+      <div className="absolute inset-0">
+        <img alt="" className="absolute block w-full h-full object-cover" src={imgRectangle328} />
+      </div>
+      <div className="absolute inset-0">
+        <img alt="" className="absolute block w-full h-full object-cover" src={imgRectangle329} />
+      </div>
+
       {/* Content */}
-      <div className="flex-1 flex flex-col items-center px-[16px] pt-[40px] overflow-y-auto">
+      <div className="absolute inset-0 flex flex-col">
+        {/* Icon + title */}
+        <div className="flex flex-col items-start px-[16px] pt-[134px]">
+          <div className="flex flex-col items-center w-full">
+            {/* Success icon */}
+            <div className="relative shrink-0" style={{ width: 224.211, height: 160 }}>
+              {/* Check circle background */}
+              <div
+                className="absolute rounded-full flex items-center justify-center"
+                style={{
+                  background: "#e6f4ea",
+                  top: "19%", bottom: "19%",
+                  left: "27.86%", right: "27.86%",
+                }}
+              >
+                <div className="absolute inset-[8.33%]">
+                  <img alt="" className="absolute block max-w-none size-full" src={imgGroup} />
+                </div>
+              </div>
+              {/* Rings */}
+              <div className="absolute" style={{ top: "18.75%", bottom: "18.75%", left: "27.48%", right: "27.92%" }}>
+                <img alt="" className="absolute block max-w-none size-full" src={imgEllipse261} />
+              </div>
+              <div className="absolute" style={{ top: "23.96%", bottom: "23.96%", left: "31.19%", right: "31.64%" }}>
+                <img alt="" className="absolute block max-w-none size-full" src={imgEllipse260} />
+              </div>
+              {/* Switch icon center */}
+              <div className="absolute overflow-hidden" style={{ top: "34.38%", bottom: "34.37%", left: "38.63%", right: "39.07%" }}>
+                <div className="absolute inset-[8.33%_12.5%]">
+                  <img alt="" className="absolute block max-w-none size-full" src={imgIcons24Switch} />
+                </div>
+              </div>
+            </div>
 
-        {/* Success icon */}
-        <div className="flex flex-col items-center gap-[16px] mb-[24px]">
-          <SuccessIcon />
-          <div className="flex flex-col items-center gap-[4px]">
-            <p className="text-white text-[20px] leading-[24px] text-center w-full"
-              style={{ fontFamily: "'Neue Haas Grotesk Display Pro', sans-serif", fontWeight: 500 }}>
-              Swap &amp; Transfer Successful
-            </p>
-            <p className="text-[#d4d4d4] text-[12px] leading-[16px] text-center w-full"
-              style={{ fontFamily: "'Inter', sans-serif" }}>
-              Funds successfully transferred to your Pintu Futures wallet.
-            </p>
-          </div>
-        </div>
-
-        {/* Progress steps card */}
-        <div className="bg-[#101214] border border-[rgba(255,255,255,0.2)] rounded-[8px] p-[16px] w-full max-w-[343px] flex gap-[8px] mb-[16px]">
-          {/* Step icons + connector */}
-          <div className="flex flex-col items-center justify-between self-stretch shrink-0">
-            <CheckCircleIcon />
-            {/* Connector line */}
-            <div className="w-px flex-1 bg-[#d4d4d4] opacity-40 my-[4px]" />
-            <CheckCircleIcon />
-          </div>
-          {/* Step labels */}
-          <div className="flex flex-1 flex-col gap-[8px]">
-            <span className="text-white text-[12px] leading-[16px]"
-              style={{ fontFamily: "'Inter', sans-serif" }}>
-              Swapping IDR to USDT
-            </span>
-            <span className="text-white text-[12px] leading-[16px]"
-              style={{ fontFamily: "'Inter', sans-serif" }}>
-              Transferring USDT to your Pintu Futures wallet
-            </span>
+            {/* Title */}
+            <div className="mt-0 w-[343px]">
+              <p
+                className="text-white text-[20px] leading-[24px] text-left w-full"
+                style={{ fontFamily: "'Neue Haas Grotesk Display Pro', sans-serif", fontWeight: 500 }}
+              >
+                Transferring USDT {usdtFormatted}
+              </p>
+            </div>
           </div>
         </div>
 
         {/* Detail rows */}
-        <div className="flex flex-col gap-[16px] w-full max-w-[343px] mb-[32px]">
+        <div className="flex flex-col gap-[25px] px-[16px] mt-[56px]">
           {[
-            { label: "From",                    value: "Pro Spot",        bold: true },
-            { label: "To",                      value: "Pintu Futures",   bold: true },
-            { label: "Swap Amount",             value: `IDR ${idrFormatted}`, bold: false },
-            { label: "Spot Taker Fee + PPN (0%)", value: `USDT ${usdtFee}`, bold: false },
-            { label: "Amount Received",         value: `USDT ${usdtReceived}`, bold: false },
+            { label: "From",           value: "Pintu Spot",    bold: true },
+            { label: "To",             value: "Pintu Futures", bold: true },
+            { label: "Amount",         value: `USDT ${usdtFormatted}`, bold: false },
+            { label: "Blockchain Fee", value: "Free",          bold: false },
           ].map(({ label, value, bold }) => (
-            <div key={label} className="flex items-start justify-between gap-[32px]">
-              <span className="text-white text-[14px] leading-[20px] opacity-60 whitespace-nowrap"
-                style={{ fontFamily: "'Inter', sans-serif" }}>
+            <div key={label} className="flex items-start w-[343px]" style={{ gap: 64 }}>
+              <span
+                className="text-white text-[14px] leading-[20px] whitespace-nowrap shrink-0"
+                style={{ fontFamily: "'Inter', sans-serif", opacity: 0.6 }}
+              >
                 {label}
               </span>
-              <span className="text-white text-[14px] leading-[20px] text-right"
-                style={{ fontFamily: "'Inter', sans-serif", fontWeight: bold ? 600 : 400 }}>
+              <span
+                className="text-white text-[14px] leading-[20px] text-right flex-1"
+                style={{ fontFamily: "'Inter', sans-serif", fontWeight: bold ? 600 : 400 }}
+              >
                 {value}
               </span>
             </div>
           ))}
         </div>
-      </div>
 
-      {/* Buttons */}
-      <div className="px-[16px] flex flex-col gap-[8px] pb-[0px] shrink-0">
-        <button
-          onClick={onOk}
-          className="h-[40px] rounded-[8px] flex items-center justify-center w-full"
-          style={{ backgroundColor: "#0f7bff" }}
-        >
-          <span className="text-white text-[14px] leading-[20px] text-center"
-            style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}>OK</span>
-        </button>
-        <button
-          onClick={onTrade}
-          className="h-[40px] rounded-[8px] flex items-center justify-center w-full"
-        >
-          <span className="text-[14px] leading-[20px] text-center"
-            style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600, color: "#0f7bff" }}>
-            Trade on Pintu Futures
-          </span>
-        </button>
-      </div>
+        <div className="flex-1" />
 
-      {/* Home indicator */}
-      <div className="flex items-end justify-center pb-2 shrink-0 safe-bottom">
-        <div className="w-[134px] h-[5px] rounded-full bg-white opacity-30" />
+        {/* Buttons */}
+        <div className="flex flex-col gap-[8px] px-[16px]">
+          <button
+            onClick={onOk}
+            className="w-full h-[40px] rounded-[8px] flex items-center justify-center"
+            style={{ backgroundColor: "#0a68f4" }}
+          >
+            <span className="text-white text-[14px] leading-[20px] text-center"
+              style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}>OK</span>
+          </button>
+          <button
+            onClick={onTrade}
+            className="w-full h-[40px] flex items-center justify-center"
+          >
+            <span className="text-[14px] leading-[20px] text-center"
+              style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600, color: "#0a68f4" }}>
+              View History
+            </span>
+          </button>
+        </div>
+
+        {/* Home indicator */}
+        <div className="flex items-end justify-center pb-2 safe-bottom">
+          <div className="w-[134px] h-[5px] rounded-full bg-white" style={{ opacity: 0.3 }} />
+        </div>
       </div>
     </div>
   );
