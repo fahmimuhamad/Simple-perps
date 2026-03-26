@@ -29,7 +29,7 @@ export default function TransferSuccessScreen({ usdtAmount, onOk, onTrade }: Tra
       {/* Content */}
       <div className="absolute inset-0 flex flex-col">
         {/* Icon + title */}
-        <div className="flex flex-col items-start px-[16px] pt-[134px]">
+        <div className="flex flex-col items-center px-[16px] pt-[134px]">
           <div className="flex flex-col items-center w-full">
             {/* Success icon */}
             <div className="relative shrink-0" style={{ width: 224.211, height: 160 }}>
@@ -62,14 +62,12 @@ export default function TransferSuccessScreen({ usdtAmount, onOk, onTrade }: Tra
             </div>
 
             {/* Title */}
-            <div className="mt-0 w-[343px]">
-              <p
-                className="text-white text-[20px] leading-[24px] text-left w-full"
-                style={{ fontFamily: "'Neue Haas Grotesk Display Pro', sans-serif", fontWeight: 500 }}
-              >
-                Transferring USDT {usdtFormatted}
-              </p>
-            </div>
+            <p
+              className="text-white text-[20px] leading-[24px] text-center w-full mt-0"
+              style={{ fontFamily: "'Neue Haas Grotesk Display Pro', sans-serif", fontWeight: 500 }}
+            >
+              Transferring USDT {usdtFormatted}
+            </p>
           </div>
         </div>
 
