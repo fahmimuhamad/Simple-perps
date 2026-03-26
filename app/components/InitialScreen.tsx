@@ -253,28 +253,6 @@ export default function InitialScreen({ onNavigateHome, variant = "A" }: Initial
 
   return (
     <div className="relative w-full h-full bg-white flex flex-col overflow-hidden">
-      {/* Status Bar */}
-      <div className="h-[44px] bg-white flex items-center justify-between px-[16px] shrink-0">
-        <span className="font-['Inter',sans-serif] font-semibold text-[14px] leading-[20px] text-[#020203]">9:41</span>
-        <div className="flex items-center gap-[6px]">
-          <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
-            <rect x="0" y="4" width="3" height="8" rx="0.5" fill="#020203" />
-            <rect x="4.5" y="2.5" width="3" height="9.5" rx="0.5" fill="#020203" />
-            <rect x="9" y="1" width="3" height="11" rx="0.5" fill="#020203" />
-            <rect x="13.5" y="0" width="2.5" height="12" rx="0.5" fill="#020203" />
-          </svg>
-          <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
-            <path d="M8 3a7 7 0 017 7" stroke="#020203" strokeWidth="1.5" strokeLinecap="round" />
-            <path d="M8 6a4 4 0 014 4" stroke="#020203" strokeWidth="1.5" strokeLinecap="round" />
-            <circle cx="8" cy="10" r="1" fill="#020203" />
-          </svg>
-          <svg width="25" height="12" viewBox="0 0 25 12" fill="none">
-            <rect x="0.5" y="0.5" width="21" height="11" rx="2.5" stroke="#020203" strokeOpacity="0.35" />
-            <rect x="2" y="2" width="18" height="8" rx="1.5" fill="#020203" />
-            <path d="M23 4v4a2 2 0 000-4z" fill="#020203" fillOpacity="0.4" />
-          </svg>
-        </div>
-      </div>
 
       {/* Navigation bar */}
       <div className="h-[48px] bg-white flex items-center justify-between px-[16px] shrink-0">

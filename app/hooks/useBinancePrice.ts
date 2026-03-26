@@ -3,40 +3,72 @@
 import { useEffect, useState, useRef } from "react";
 
 export interface BinanceTickerData {
-  price: number;       // last price
-  change: number;      // 24h price change
-  changePct: number;   // 24h price change %
-  high: number;        // 24h high
-  low: number;         // 24h low
-  volume: number;      // 24h volume in USDT
+  price: number;
+  change: number;
+  changePct: number;
+  high: number;
+  low: number;
+  volume: number;
 }
 
-export function useBinancePrice(symbol = "btcusdt"): BinanceTickerData | null {
+export function useBinancePrice(symbol = "BTCUSDT"): BinanceTickerData | null {
   const [data, setData] = useState<BinanceTickerData | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
+  const sym = symbol.toUpperCase();
 
+  // Initial REST snapshot
   useEffect(() => {
-    const url = `wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@ticker`;
+    fetch(`https://api.bybit.com/v5/market/tickers?category=linear&symbol=${sym}`)
+      .then((r) => r.json())
+      .then((json) => {
+        const t = json.result?.list?.[0];
+        if (!t) return;
+        const price = parseFloat(t.lastPrice);
+        const prevClose = parseFloat(t.prevPrice24h);
+        setData({
+          price,
+          change: price - prevClose,
+          changePct: parseFloat(t.price24hPcnt) * 100,
+          high: parseFloat(t.highPrice24h),
+          low: parseFloat(t.lowPrice24h),
+          volume: parseFloat(t.turnover24h),
+        });
+      })
+      .catch(() => {});
+  }, [sym]);
 
+  // Live updates via Bybit WebSocket
+  useEffect(() => {
     function connect() {
-      const ws = new WebSocket(url);
+      const ws = new WebSocket("wss://stream.bybit.com/v5/public/linear");
       wsRef.current = ws;
+
+      ws.onopen = () => {
+        ws.send(JSON.stringify({ op: "subscribe", args: [`tickers.${sym}`] }));
+      };
 
       ws.onmessage = (e) => {
         const msg = JSON.parse(e.data);
-        setData({
-          price: parseFloat(msg.c),
-          change: parseFloat(msg.p),
-          changePct: parseFloat(msg.P),
-          high: parseFloat(msg.h),
-          low: parseFloat(msg.l),
-          volume: parseFloat(msg.q), // quote asset volume (USDT)
-        });
+        if (msg.topic === `tickers.${sym}` && msg.data) {
+          const t = msg.data;
+          setData((prev) => {
+            const price = t.lastPrice ? parseFloat(t.lastPrice) : (prev?.price ?? 0);
+            const prevClose = t.prevPrice24h ? parseFloat(t.prevPrice24h) : (prev ? prev.price - prev.change : price);
+            const changePct = t.price24hPcnt ? parseFloat(t.price24hPcnt) * 100 : (prev?.changePct ?? 0);
+            return {
+              price,
+              change: price - prevClose,
+              changePct,
+              high: t.highPrice24h ? parseFloat(t.highPrice24h) : (prev?.high ?? 0),
+              low: t.lowPrice24h ? parseFloat(t.lowPrice24h) : (prev?.low ?? 0),
+              volume: t.turnover24h ? parseFloat(t.turnover24h) : (prev?.volume ?? 0),
+            };
+          });
+        }
       };
 
       ws.onerror = () => ws.close();
       ws.onclose = () => {
-        // Reconnect after 3s if not intentionally closed
         setTimeout(() => {
           if (wsRef.current === ws) connect();
         }, 3000);
@@ -50,7 +82,7 @@ export function useBinancePrice(symbol = "btcusdt"): BinanceTickerData | null {
       wsRef.current = null;
       ws?.close();
     };
-  }, [symbol]);
+  }, [sym]);
 
   return data;
 }

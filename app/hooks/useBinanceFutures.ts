@@ -3,13 +3,13 @@
 import { useEffect, useState, useRef } from "react";
 
 export interface FundingData {
-  fundingRate: number;   // e.g. 0.00004713
+  fundingRate: number;
   nextFundingTime: number; // unix ms
 }
 
 export interface LongShortData {
-  longPct: number;   // e.g. 46.74
-  shortPct: number;  // e.g. 53.26
+  longPct: number;
+  shortPct: number;
 }
 
 function msToCountdown(targetMs: number): string {
@@ -25,17 +25,18 @@ export function useFundingRate(symbol = "BTCUSDT"): { funding: FundingData | nul
   const [countdown, setCountdown] = useState("—");
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Fetch funding rate (refreshes every 30s)
   useEffect(() => {
     async function fetchFunding() {
       try {
         const res = await fetch(
-          `https://fapi.binance.com/fapi/v1/premiumIndex?symbol=${symbol}`
+          `https://api.bybit.com/v5/market/tickers?category=linear&symbol=${symbol}`
         );
         const data = await res.json();
+        const t = data.result?.list?.[0];
+        if (!t) return;
         setFunding({
-          fundingRate: parseFloat(data.lastFundingRate),
-          nextFundingTime: data.nextFundingTime,
+          fundingRate: parseFloat(t.fundingRate),
+          nextFundingTime: parseInt(t.nextFundingTime),
         });
       } catch {}
     }
@@ -45,7 +46,6 @@ export function useFundingRate(symbol = "BTCUSDT"): { funding: FundingData | nul
     return () => clearInterval(id);
   }, [symbol]);
 
-  // Countdown ticker (every second)
   useEffect(() => {
     if (!funding) return;
     function tick() {
@@ -61,30 +61,33 @@ export function useFundingRate(symbol = "BTCUSDT"): { funding: FundingData | nul
   return { funding, countdown };
 }
 
-export function useLongShortRatio(symbol = "BTCUSDT", period = "5m"): LongShortData | null {
+export function useLongShortRatio(symbol = "BTCUSDT"): LongShortData | null {
   const [data, setData] = useState<LongShortData | null>(null);
 
   useEffect(() => {
     async function fetchRatio() {
       try {
+        // Bybit buy/sell ratio endpoint (long = buy side)
         const res = await fetch(
-          `https://fapi.binance.com/futures/data/globalLongShortAccountRatio?symbol=${symbol}&period=${period}&limit=1`
+          `https://api.bybit.com/v5/market/account-ratio?category=linear&symbol=${symbol}&period=1h&limit=1`
         );
         const json = await res.json();
-        if (json.length) {
-          const item = json[0];
-          setData({
-            longPct: parseFloat(item.longAccount) * 100,
-            shortPct: parseFloat(item.shortAccount) * 100,
-          });
-        }
+        const item = json.result?.list?.[0];
+        if (!item) return;
+        const buyRatio = parseFloat(item.buyRatio);
+        const sellRatio = parseFloat(item.sellRatio);
+        const total = buyRatio + sellRatio || 1;
+        setData({
+          longPct: (buyRatio / total) * 100,
+          shortPct: (sellRatio / total) * 100,
+        });
       } catch {}
     }
 
     fetchRatio();
-    const id = setInterval(fetchRatio, 30_000); // refresh every 30s
+    const id = setInterval(fetchRatio, 30_000);
     return () => clearInterval(id);
-  }, [symbol, period]);
+  }, [symbol]);
 
   return data;
 }

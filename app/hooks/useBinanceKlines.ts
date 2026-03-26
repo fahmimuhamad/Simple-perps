@@ -12,69 +12,90 @@ export interface Kline {
 }
 
 const INTERVAL_MAP: Record<string, string> = {
-  "1m": "1m",
-  "15m": "15m",
-  "1H": "1h",
-  "4H": "4h",
-  "1D": "1d",
+  "1m": "1",
+  "15m": "15",
+  "1H": "60",
+  "4H": "240",
+  "1D": "D",
 };
 
-function parseKlines(raw: unknown[][]): Kline[] {
-  return raw.map((k) => ({
-    openTime: k[0] as number,
-    open: parseFloat(k[1] as string),
-    high: parseFloat(k[2] as string),
-    low: parseFloat(k[3] as string),
-    close: parseFloat(k[4] as string),
-    volume: parseFloat(k[7] as string), // quote asset volume
+const WS_INTERVAL_MAP: Record<string, string> = {
+  "1m": "1",
+  "15m": "15",
+  "1H": "60",
+  "4H": "240",
+  "1D": "D",
+};
+
+function parseBybitKlines(list: string[][]): Kline[] {
+  // Bybit returns newest first, so reverse
+  return list.slice().reverse().map((k) => ({
+    openTime: parseInt(k[0]),
+    open: parseFloat(k[1]),
+    high: parseFloat(k[2]),
+    low: parseFloat(k[3]),
+    close: parseFloat(k[4]),
+    volume: parseFloat(k[5]),
   }));
 }
 
 export function useBinanceKlines(symbol = "BTCUSDT", timeframe = "15m", limit = 500): Kline[] {
   const [klines, setKlines] = useState<Kline[]>([]);
-  const interval = INTERVAL_MAP[timeframe] ?? "15m";
+  const interval = INTERVAL_MAP[timeframe] ?? "15";
+  const wsInterval = WS_INTERVAL_MAP[timeframe] ?? "15";
   const wsRef = useRef<WebSocket | null>(null);
 
-  // Initial REST fetch
+  // Initial REST fetch from Bybit
   useEffect(() => {
-    const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`;
+    const url = `https://api.bybit.com/v5/market/kline?category=linear&symbol=${symbol}&interval=${interval}&limit=${limit}`;
     fetch(url)
       .then((r) => r.json())
-      .then((data) => setKlines(parseKlines(data)))
+      .then((data) => {
+        if (data.result?.list) {
+          setKlines(parseBybitKlines(data.result.list));
+        }
+      })
       .catch(() => {});
   }, [symbol, interval, limit]);
 
-  // Live updates via WebSocket — updates the last (current) candle
+  // Live updates via Bybit WebSocket
   useEffect(() => {
-    const streamUrl = `wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@kline_${interval}`;
+    const streamUrl = "wss://stream.bybit.com/v5/public/linear";
 
     function connect() {
       const ws = new WebSocket(streamUrl);
       wsRef.current = ws;
 
+      ws.onopen = () => {
+        ws.send(JSON.stringify({
+          op: "subscribe",
+          args: [`kline.${wsInterval}.${symbol}`],
+        }));
+      };
+
       ws.onmessage = (e) => {
         const msg = JSON.parse(e.data);
-        const k = msg.k;
-        const updated: Kline = {
-          openTime: k.t,
-          open: parseFloat(k.o),
-          high: parseFloat(k.h),
-          low: parseFloat(k.l),
-          close: parseFloat(k.c),
-          volume: parseFloat(k.q),
-        };
+        if (msg.topic && msg.data?.[0]) {
+          const k = msg.data[0];
+          const updated: Kline = {
+            openTime: k.start,
+            open: parseFloat(k.open),
+            high: parseFloat(k.high),
+            low: parseFloat(k.low),
+            close: parseFloat(k.close),
+            volume: parseFloat(k.volume),
+          };
 
-        setKlines((prev) => {
-          if (!prev.length) return prev;
-          const last = prev[prev.length - 1];
-          if (last.openTime === updated.openTime) {
-            // Update current candle
-            return [...prev.slice(0, -1), updated];
-          } else {
-            // New candle opened
-            return [...prev.slice(1), updated];
-          }
-        });
+          setKlines((prev) => {
+            if (!prev.length) return prev;
+            const last = prev[prev.length - 1];
+            if (last.openTime === updated.openTime) {
+              return [...prev.slice(0, -1), updated];
+            } else {
+              return [...prev.slice(1), updated];
+            }
+          });
+        }
       };
 
       ws.onerror = () => ws.close();
@@ -92,7 +113,7 @@ export function useBinanceKlines(symbol = "BTCUSDT", timeframe = "15m", limit = 
       wsRef.current = null;
       ws?.close();
     };
-  }, [symbol, interval]);
+  }, [symbol, wsInterval]);
 
   return klines;
 }
