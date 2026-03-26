@@ -26,14 +26,14 @@ export function useFundingRate(symbol = "BTCUSDT"): { funding: FundingData | nul
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
+    let cancelled = false;
+
     async function fetchFunding() {
       try {
-        const res = await fetch(
-          `https://api.bybit.com/v5/market/tickers?category=linear&symbol=${symbol}`
-        );
+        const res = await fetch(`/api/funding?symbol=${symbol}`);
         const data = await res.json();
         const t = data.result?.list?.[0];
-        if (!t) return;
+        if (!t || cancelled) return;
         setFunding({
           fundingRate: parseFloat(t.fundingRate),
           nextFundingTime: parseInt(t.nextFundingTime),
@@ -43,9 +43,13 @@ export function useFundingRate(symbol = "BTCUSDT"): { funding: FundingData | nul
 
     fetchFunding();
     const id = setInterval(fetchFunding, 30_000);
-    return () => clearInterval(id);
+    return () => {
+      cancelled = true;
+      clearInterval(id);
+    };
   }, [symbol]);
 
+  // Countdown ticker (every second)
   useEffect(() => {
     if (!funding) return;
     function tick() {
@@ -65,15 +69,14 @@ export function useLongShortRatio(symbol = "BTCUSDT"): LongShortData | null {
   const [data, setData] = useState<LongShortData | null>(null);
 
   useEffect(() => {
+    let cancelled = false;
+
     async function fetchRatio() {
       try {
-        // Bybit buy/sell ratio endpoint (long = buy side)
-        const res = await fetch(
-          `https://api.bybit.com/v5/market/account-ratio?category=linear&symbol=${symbol}&period=1h&limit=1`
-        );
+        const res = await fetch(`/api/longshortratio?symbol=${symbol}`);
         const json = await res.json();
         const item = json.result?.list?.[0];
-        if (!item) return;
+        if (!item || cancelled) return;
         const buyRatio = parseFloat(item.buyRatio);
         const sellRatio = parseFloat(item.sellRatio);
         const total = buyRatio + sellRatio || 1;
@@ -86,7 +89,10 @@ export function useLongShortRatio(symbol = "BTCUSDT"): LongShortData | null {
 
     fetchRatio();
     const id = setInterval(fetchRatio, 30_000);
-    return () => clearInterval(id);
+    return () => {
+      cancelled = true;
+      clearInterval(id);
+    };
   }, [symbol]);
 
   return data;
