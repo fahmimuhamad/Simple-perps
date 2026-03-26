@@ -1,7 +1,9 @@
 "use client";
 
+type SelectVariant = "A" | "B" | "A-pos" | "B-pos";
+
 interface VariantSelectionScreenProps {
-  onSelect: (variant: "A" | "B") => void;
+  onSelect: (variant: SelectVariant) => void;
 }
 
 export default function VariantSelectionScreen({ onSelect }: VariantSelectionScreenProps) {
@@ -37,9 +39,34 @@ export default function VariantSelectionScreen({ onSelect }: VariantSelectionScr
             <div className="w-[28px] h-[28px] rounded-full bg-[#0a68f4] flex items-center justify-center shrink-0">
               <span className="font-['Inter',sans-serif] font-semibold text-[13px] text-white leading-none">A</span>
             </div>
-            <span className="font-['Inter',sans-serif] font-semibold text-[15px] leading-[22px] text-[#020203]">
-              Option A — Current Flow
-            </span>
+            <div className="flex flex-col items-start">
+              <span className="font-['Inter',sans-serif] font-semibold text-[15px] leading-[22px] text-[#020203]">
+                Option A — Current Flow
+              </span>
+              <span className="font-['Inter',sans-serif] text-[12px] leading-[16px] text-[#626363]">
+                No position, open via order sheet
+              </span>
+            </div>
+          </div>
+        </button>
+
+        {/* Option A with position */}
+        <button
+          onClick={() => onSelect("A-pos")}
+          className="w-full border border-[#0a68f4] rounded-[12px] p-[16px] flex flex-col items-start text-left hover:bg-[#f0f5ff] active:bg-[#e0edff] transition-colors"
+        >
+          <div className="flex items-center gap-[8px]">
+            <div className="w-[28px] h-[28px] rounded-full bg-[#0a68f4] flex items-center justify-center shrink-0">
+              <span className="font-['Inter',sans-serif] font-semibold text-[13px] text-white leading-none">A</span>
+            </div>
+            <div className="flex flex-col items-start">
+              <span className="font-['Inter',sans-serif] font-semibold text-[15px] leading-[22px] text-[#0a68f4]">
+                Option A — Open Position
+              </span>
+              <span className="font-['Inter',sans-serif] text-[12px] leading-[16px] text-[#626363]">
+                Pre-seeded with active Long BTC position
+              </span>
+            </div>
           </div>
         </button>
 
@@ -52,9 +79,34 @@ export default function VariantSelectionScreen({ onSelect }: VariantSelectionScr
             <div className="w-[28px] h-[28px] rounded-full bg-[#25a764] flex items-center justify-center shrink-0">
               <span className="font-['Inter',sans-serif] font-semibold text-[13px] text-white leading-none">B</span>
             </div>
-            <span className="font-['Inter',sans-serif] font-semibold text-[15px] leading-[22px] text-[#020203]">
-              Option B — Simplified View
-            </span>
+            <div className="flex flex-col items-start">
+              <span className="font-['Inter',sans-serif] font-semibold text-[15px] leading-[22px] text-[#020203]">
+                Option B — Simplified View
+              </span>
+              <span className="font-['Inter',sans-serif] text-[12px] leading-[16px] text-[#626363]">
+                No position, open via order sheet
+              </span>
+            </div>
+          </div>
+        </button>
+
+        {/* Option B with position */}
+        <button
+          onClick={() => onSelect("B-pos")}
+          className="w-full border border-[#25a764] rounded-[12px] p-[16px] flex flex-col items-start text-left hover:bg-[#f0faf5] active:bg-[#e0f5ea] transition-colors"
+        >
+          <div className="flex items-center gap-[8px]">
+            <div className="w-[28px] h-[28px] rounded-full bg-[#25a764] flex items-center justify-center shrink-0">
+              <span className="font-['Inter',sans-serif] font-semibold text-[13px] text-white leading-none">B</span>
+            </div>
+            <div className="flex flex-col items-start">
+              <span className="font-['Inter',sans-serif] font-semibold text-[15px] leading-[22px] text-[#25a764]">
+                Option B — Open Position
+              </span>
+              <span className="font-['Inter',sans-serif] text-[12px] leading-[16px] text-[#626363]">
+                Pre-seeded with active Long BTC position
+              </span>
+            </div>
           </div>
         </button>
       </div>

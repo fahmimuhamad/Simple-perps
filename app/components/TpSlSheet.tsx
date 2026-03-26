@@ -69,7 +69,7 @@ export default function TpSlSheet({
   onConfirm,
   onClose,
 }: TpSlSheetProps) {
-  const [mode, setMode] = useState<Mode>("PnL");
+  const [mode, setMode] = useState<Mode>("Price");
   const [tpEnabled, setTpEnabled] = useState(initialTpEnabled);
   const [slEnabled, setSlEnabled] = useState(initialSlEnabled);
 
@@ -161,9 +161,9 @@ export default function TpSlSheet({
         Take Profit/Stop Loss
       </span>
 
-      {/* Segmented Control: PnL | Price */}
+      {/* Segmented Control: Price | % PnL */}
       <div className="bg-[#f2f2f2] flex items-start p-[2px] rounded-[8px] w-[calc(100%-32px)]">
-        {(["PnL", "Price"] as Mode[]).map((m) => (
+        {(["Price", "PnL"] as Mode[]).map((m) => (
           <button
             key={m}
             onClick={() => handleModeSwitch(m)}
@@ -174,7 +174,7 @@ export default function TpSlSheet({
               className="text-[14px] leading-[20px] text-center"
               style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600, color: mode === m ? "#020203" : "#8d8e8e" }}
             >
-              {m === "PnL" ? "PnL" : "Price"}
+              {m === "PnL" ? "% PnL" : "Price"}
             </span>
           </button>
         ))}
@@ -186,48 +186,49 @@ export default function TpSlSheet({
         <div className="flex items-center gap-[6px]">
           <Checkbox checked={tpEnabled} onChange={() => setTpEnabled((v) => !v)} />
           <span className="text-[12px] leading-[16px] text-[#020203]" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}>
-            Take Profit (TP)
+            Take Profit Price (TP)
           </span>
         </div>
 
-        {/* Input */}
-        <div
-          className="bg-white rounded-[6px] h-[32px] flex items-center px-[8px]"
-          style={{ border: inputBorder(false), opacity: tpEnabled ? 1 : 0.4 }}
-        >
-          <input
-            type={tpEnabled && (mode === "PnL" ? tpPnlInput : tpPriceInput) ? "number" : "text"}
-            inputMode="decimal"
-            disabled={!tpEnabled}
-            value={mode === "PnL" ? tpPnlInput : tpPriceInput}
-            onChange={(e) =>
-              mode === "PnL" ? setTpPnlInput(e.target.value) : setTpPriceInput(e.target.value)
-            }
-            placeholder={tpEnabled ? (mode === "PnL" ? "Enter PnL amount" : "Enter price") : "—"}
-            className="flex-1 bg-transparent outline-none text-[12px] leading-[16px] text-[#020203] placeholder:text-[#8d8e8e] placeholder:font-normal"
-            style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}
-          />
-          <span className="text-[12px] leading-[16px] text-[#8d8e8e] ml-[4px] shrink-0" style={{ fontFamily: "'Inter', sans-serif" }}>
-            USDT
-          </span>
-        </div>
-
-        {/* Estimated row */}
+        {/* Input — only shown when enabled */}
         {tpEnabled && (
-          <div className="flex items-center justify-between">
-            <span className="text-[12px] leading-[16px] text-[#626363]" style={{ fontFamily: "'Inter', sans-serif" }}>
-              {mode === "PnL" ? "Estimated Price" : "Estimated Profit"}
-            </span>
-            <span
-              className="text-[12px] leading-[16px]"
-              style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600, color: "#25a764" }}
+          <>
+            <div
+              className="bg-white rounded-[6px] h-[32px] flex items-center px-[8px]"
+              style={{ border: inputBorder(false) }}
             >
-              {mode === "PnL"
-                ? tpTrigger > 0 ? formatPrice(tpTrigger) : "—"
-                : tpEstProfit > 0 ? `USDT ${tpEstProfit.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "—"
-              }
-            </span>
-          </div>
+              <input
+                type={(mode === "PnL" ? tpPnlInput : tpPriceInput) ? "number" : "text"}
+                inputMode="decimal"
+                value={mode === "PnL" ? tpPnlInput : tpPriceInput}
+                onChange={(e) =>
+                  mode === "PnL" ? setTpPnlInput(e.target.value) : setTpPriceInput(e.target.value)
+                }
+                placeholder={mode === "PnL" ? "Enter PnL amount" : "Enter price"}
+                className="flex-1 bg-transparent outline-none text-[12px] leading-[16px] text-[#020203] placeholder:text-[#8d8e8e] placeholder:font-normal"
+                style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}
+              />
+              <span className="text-[12px] leading-[16px] text-[#8d8e8e] ml-[4px] shrink-0" style={{ fontFamily: "'Inter', sans-serif" }}>
+                USDT
+              </span>
+            </div>
+
+            {/* Estimated row */}
+            <div className="flex items-center justify-between">
+              <span className="text-[12px] leading-[16px] text-[#626363]" style={{ fontFamily: "'Inter', sans-serif" }}>
+                {mode === "PnL" ? "Estimated Price" : "Estimated Profit"}
+              </span>
+              <span
+                className="text-[12px] leading-[16px]"
+                style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600, color: "#25a764" }}
+              >
+                {mode === "PnL"
+                  ? tpTrigger > 0 ? formatPrice(tpTrigger) : "—"
+                  : tpEstProfit > 0 ? `USDT ${tpEstProfit.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "—"
+                }
+              </span>
+            </div>
+          </>
         )}
       </div>
 
@@ -237,57 +238,72 @@ export default function TpSlSheet({
         <div className="flex items-center gap-[6px]">
           <Checkbox checked={slEnabled} onChange={() => setSlEnabled((v) => !v)} />
           <span className="text-[12px] leading-[16px] text-[#020203]" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}>
-            Stop Loss (SL)
+            Stop Loss Price (SL)
           </span>
         </div>
 
-        {/* Input */}
-        <div
-          className="bg-white rounded-[6px] h-[32px] flex items-center px-[8px]"
-          style={{ border: inputBorder(slBelowLiq), opacity: slEnabled ? 1 : 0.4 }}
-        >
-          <input
-            type={slEnabled && (mode === "PnL" ? slPnlInput : slPriceInput) ? "number" : "text"}
-            inputMode="decimal"
-            disabled={!slEnabled}
-            value={mode === "PnL" ? slPnlInput : slPriceInput}
-            onChange={(e) =>
-              mode === "PnL" ? setSlPnlInput(e.target.value) : setSlPriceInput(e.target.value)
-            }
-            placeholder={slEnabled ? (mode === "PnL" ? "Enter loss amount" : "Enter price") : "—"}
-            className="flex-1 bg-transparent outline-none text-[12px] leading-[16px] text-[#020203] placeholder:text-[#8d8e8e] placeholder:font-normal"
-            style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}
-          />
-          <span className="text-[12px] leading-[16px] text-[#8d8e8e] ml-[4px] shrink-0" style={{ fontFamily: "'Inter', sans-serif" }}>
-            USDT
-          </span>
-        </div>
-
-        {/* Error */}
-        {slBelowLiq && (
-          <span className="text-[10px] leading-[14px] text-[#e54040]" style={{ fontFamily: "'Inter', sans-serif" }}>
-            Stop Loss Trigger Price must be higher than Liquidation Price
-          </span>
-        )}
-
-        {/* Estimated row */}
-        {slEnabled && !slBelowLiq && (
-          <div className="flex items-center justify-between">
-            <span className="text-[12px] leading-[16px] text-[#626363]" style={{ fontFamily: "'Inter', sans-serif" }}>
-              {mode === "PnL" ? "Estimated Price" : "Estimated Loss"}
-            </span>
-            <span
-              className="text-[12px] leading-[16px]"
-              style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600, color: "#626363" }}
+        {/* Input — only shown when enabled */}
+        {slEnabled && (
+          <>
+            <div
+              className="bg-white rounded-[6px] h-[32px] flex items-center px-[8px]"
+              style={{ border: inputBorder(slBelowLiq) }}
             >
-              {mode === "PnL"
-                ? slTrigger > 0 ? formatPrice(slTrigger) : "—"
-                : slEstLoss > 0 ? `USDT ${slEstLoss.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "—"
-              }
-            </span>
-          </div>
+              <input
+                type={(mode === "PnL" ? slPnlInput : slPriceInput) ? "number" : "text"}
+                inputMode="decimal"
+                value={mode === "PnL" ? slPnlInput : slPriceInput}
+                onChange={(e) =>
+                  mode === "PnL" ? setSlPnlInput(e.target.value) : setSlPriceInput(e.target.value)
+                }
+                placeholder={mode === "PnL" ? "Enter loss amount" : "Enter price"}
+                className="flex-1 bg-transparent outline-none text-[12px] leading-[16px] text-[#020203] placeholder:text-[#8d8e8e] placeholder:font-normal"
+                style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}
+              />
+              <span className="text-[12px] leading-[16px] text-[#8d8e8e] ml-[4px] shrink-0" style={{ fontFamily: "'Inter', sans-serif" }}>
+                USDT
+              </span>
+            </div>
+
+            {/* Error */}
+            {slBelowLiq && (
+              <span className="text-[10px] leading-[14px] text-[#e54040]" style={{ fontFamily: "'Inter', sans-serif" }}>
+                Stop Loss Trigger Price must be higher than Liquidation Price
+              </span>
+            )}
+
+            {/* Estimated row */}
+            {!slBelowLiq && (
+              <div className="flex items-center justify-between">
+                <span className="text-[12px] leading-[16px] text-[#626363]" style={{ fontFamily: "'Inter', sans-serif" }}>
+                  {mode === "PnL" ? "Estimated Price" : "Estimated Loss"}
+                </span>
+                <span
+                  className="text-[12px] leading-[16px]"
+                  style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600, color: "#626363" }}
+                >
+                  {mode === "PnL"
+                    ? slTrigger > 0 ? formatPrice(slTrigger) : "—"
+                    : slEstLoss > 0 ? `USDT ${slEstLoss.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "—"
+                  }
+                </span>
+              </div>
+            )}
+          </>
         )}
       </div>
+
+      {/* Est. Liquidation Price */}
+      {estLiqPrice > 0 && (
+        <div className="flex items-center justify-between w-full px-[16px]">
+          <span className="text-[12px] leading-[16px] text-[#626363]" style={{ fontFamily: "'Inter', sans-serif" }}>
+            Est. Liquidation Price
+          </span>
+          <span className="text-[12px] leading-[16px] text-[#626363]" style={{ fontFamily: "'Inter', sans-serif" }}>
+            {`USDT ${formatPrice(estLiqPrice)} (${entryPrice > 0 ? ((side === "Long" ? estLiqPrice - entryPrice : entryPrice - estLiqPrice) / entryPrice * 100).toFixed(1) : "0"}%)`}
+          </span>
+        </div>
+      )}
 
       {/* Confirm */}
       <button

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import OrderTypeSheet from "./OrderTypeSheet";
 import PositionCard from "./PositionCard";
 import PositionCardB from "./PositionCardB";
@@ -134,9 +134,10 @@ interface OpenPosition {
 interface InitialScreenProps {
   onNavigateHome?: () => void;
   variant?: "A" | "B";
+  startWithPosition?: boolean;
 }
 
-export default function InitialScreen({ onNavigateHome, variant = "A" }: InitialScreenProps) {
+export default function InitialScreen({ onNavigateHome, variant = "A", startWithPosition }: InitialScreenProps) {
   const [activeTimeframe, setActiveTimeframe] = useState("15m");
   const [chartType, setChartType] = useState<"line" | "candle">("line");
   const [openSheet, setOpenSheet] = useState<Side | null>(null);
@@ -186,6 +187,25 @@ export default function InitialScreen({ onNavigateHome, variant = "A" }: Initial
   const livePrice = ticker?.price ?? 0;
   const livePriceDisplay = livePrice > 0 ? formatDisplayPrice(livePrice) : "—";
   const livePriceForSheet = livePrice > 0 ? toEuropeanPrice(livePrice) : "70.488,5";
+
+  // Seed position with live price when startWithPosition is true
+  useEffect(() => {
+    if (!startWithPosition || position !== null || livePrice <= 0) return;
+    const leverage = 10;
+    const margin = 200;
+    const positionSize = margin * leverage;
+    const estLiqPrice = livePrice * (1 - 1 / leverage);
+    setPosition({
+      side: "Long",
+      leverage,
+      positionSize,
+      margin,
+      entryPrice: livePrice,
+      tpPrice: 0,
+      slPrice: livePrice * 0.96,
+      estLiqPrice,
+    });
+  }, [startWithPosition, livePrice, position]);
 
   const changeAbs = ticker?.change ?? 0;
   const changePct = ticker?.changePct ?? 0;

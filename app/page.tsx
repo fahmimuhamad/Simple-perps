@@ -6,21 +6,31 @@ import InitialScreen from "./components/InitialScreen";
 import VariantSelectionScreen from "./components/VariantSelectionScreen";
 import OnboardingSheet from "./components/OnboardingSheet";
 
-type Variant = "A" | "B";
+type SelectVariant = "A" | "B" | "A-pos" | "B-pos";
 
 export default function Home() {
   const [screen, setScreen] = useState<"select" | "home" | "futures">("select");
-  const [variant, setVariant] = useState<Variant>("A");
+  const [variant, setVariant] = useState<"A" | "B">("A");
+  const [withPosition, setWithPosition] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [onboardingDone, setOnboardingDone] = useState(false);
 
-  function handleVariantSelect(v: Variant) {
-    setVariant(v);
+  function handleVariantSelect(v: SelectVariant) {
+    if (v === "A-pos") {
+      setVariant("A");
+      setWithPosition(true);
+    } else if (v === "B-pos") {
+      setVariant("B");
+      setWithPosition(true);
+    } else {
+      setVariant(v);
+      setWithPosition(false);
+    }
     setScreen("home");
   }
 
   function handleNavigateFutures() {
-    if (!onboardingDone) {
+    if (!onboardingDone && !withPosition) {
       setScreen("futures");
       setShowOnboarding(true);
     } else {
@@ -43,6 +53,7 @@ export default function Home() {
         {screen === "futures" && (
           <InitialScreen
             variant={variant}
+            startWithPosition={withPosition}
             onNavigateHome={() => setScreen("home")}
           />
         )}
