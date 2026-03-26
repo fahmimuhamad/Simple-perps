@@ -194,7 +194,7 @@ export default function OnboardingSheet({ onDone }: OnboardingSheetProps) {
           </button>
 
           {/* Home indicator */}
-          <div className="w-[134px] h-[34px] flex items-center justify-center">
+          <div className="w-[134px] flex items-center justify-center safe-bottom">
             <div className="w-[134px] h-[5px] rounded-full bg-[#020203] opacity-20" />
           </div>
         </div>

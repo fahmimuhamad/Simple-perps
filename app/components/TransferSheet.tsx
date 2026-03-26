@@ -293,7 +293,7 @@ export default function TransferSheet({ available = AVAILABLE, onConfirm, onClos
           </div>
         ))}
         {/* Home indicator */}
-        <div className="flex items-center justify-center py-[8px]">
+        <div className="flex items-center justify-center py-[8px] safe-bottom">
           <div className="w-[134px] h-[5px] rounded-full bg-black" />
         </div>
       </div>

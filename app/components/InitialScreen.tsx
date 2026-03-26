@@ -471,7 +471,7 @@ export default function InitialScreen({ onNavigateHome, variant = "A" }: Initial
       </div>
 
       {/* Bottom Navigation */}
-      <div className="shrink-0 flex flex-col items-center pt-[8px] border-t-[0.5px] border-[rgba(2,2,3,0.1)] bg-[rgba(255,255,255,0.96)]">
+      <div className="shrink-0 flex flex-col items-center pt-[8px] border-t-[0.5px] border-[rgba(2,2,3,0.1)] bg-[rgba(255,255,255,0.96)] safe-bottom">
         <div className="flex items-start justify-between w-full px-[8px]">
           {/* Home */}
           <button className="flex flex-col gap-[4px] items-center justify-center overflow-clip px-[16px] w-[58px]" onClick={onNavigateHome}>

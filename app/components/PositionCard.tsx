@@ -233,7 +233,7 @@ export default function PositionCard({
         <div className="flex gap-[16px] w-full">
           <button onClick={onAdjustLeverage} className="border border-[rgba(2,2,3,0.1)] rounded-[4px] h-[44px] px-[16px] flex items-center justify-center hover:bg-[#f2f2f2] transition-colors whitespace-nowrap">
             <span className="font-['Inter',sans-serif] font-semibold text-[14px] leading-[20px] text-[#020203]">
-              Adjust Leverage
+              Adjust Position
             </span>
           </button>
           <button className="border border-[rgba(2,2,3,0.1)] rounded-[4px] h-[44px] flex-1 flex items-center justify-center hover:bg-[#f2f2f2] transition-colors" onClick={onClosePosition}>

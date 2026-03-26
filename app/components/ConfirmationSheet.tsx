@@ -153,7 +153,7 @@ export default function ConfirmationSheet({
       </div>
 
       {/* Home indicator */}
-      <div className="w-[134px] h-[34px] flex items-end justify-center pb-2">
+      <div className="w-[134px] flex items-end justify-center pb-2 safe-bottom">
         <div className="w-[134px] h-[5px] rounded-full bg-[#020203]" />
       </div>
     </div>

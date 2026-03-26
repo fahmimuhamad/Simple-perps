@@ -35,8 +35,9 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-[#1a1a1a] flex items-center justify-center">
-      <div className="relative w-[390px] h-[844px] overflow-hidden shadow-2xl">
+    <main className="bg-[#1a1a1a] flex items-center justify-center" style={{ minHeight: "100dvh" }}>
+      <div className="relative w-full max-w-[390px] overflow-hidden shadow-2xl"
+        style={{ height: "100dvh" }}>
         {screen === "select" && (
           <VariantSelectionScreen onSelect={handleVariantSelect} />
         )}

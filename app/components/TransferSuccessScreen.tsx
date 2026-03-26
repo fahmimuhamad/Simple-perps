@@ -141,7 +141,7 @@ export default function TransferSuccessScreen({ usdtAmount, onOk, onTrade }: Tra
       </div>
 
       {/* Home indicator */}
-      <div className="flex items-end justify-center h-[34px] pb-2 shrink-0">
+      <div className="flex items-end justify-center pb-2 shrink-0 safe-bottom">
         <div className="w-[134px] h-[5px] rounded-full bg-white opacity-30" />
       </div>
     </div>

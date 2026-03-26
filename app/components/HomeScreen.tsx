@@ -481,7 +481,7 @@ export default function HomeScreen({ onNavigateFutures }: HomeScreenProps) {
       </div>
 
       {/* ── Bottom Navigation ───────────────────────────────── */}
-      <div className="absolute bottom-0 left-0 right-0 border-t-[0.5px] border-[rgba(2,2,3,0.2)] bg-white flex flex-col items-center pt-[8px] z-10">
+      <div className="absolute bottom-0 left-0 right-0 border-t-[0.5px] border-[rgba(2,2,3,0.2)] bg-white flex flex-col items-center pt-[8px] z-10 safe-bottom">
         <div className="flex items-start justify-between w-full px-[8px]">
 
           {/* Home */}
