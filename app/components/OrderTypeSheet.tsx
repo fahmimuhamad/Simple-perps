@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import InsufficientMarginSheet from "./InsufficientMarginSheet";
+import { useLang } from "../LangContext";
 
 type Side = "Long" | "Short";
 
@@ -69,12 +70,13 @@ export default function OrderTypeSheet({
   slEnabled: controlledSlEnabled,
 }: OrderTypeSheetProps) {
   const [side] = useState<Side>(initialSide);
+  const { t } = useLang();
   const [amount, setAmount] = useState("0");
   const [internalLeverage, setInternalLeverage] = useState(initialLeverage);
 
   const [tpPct, setTpPct] = useState(DEFAULT_TP_PCT);
   const [slPct, setSlPct] = useState(DEFAULT_SL_PCT);
-  const [internalTpEnabled, setInternalTpEnabled] = useState(true);
+  const [internalTpEnabled, setInternalTpEnabled] = useState(false);
   const [internalSlEnabled, setInternalSlEnabled] = useState(true);
 
   const [showInsufficientMargin, setShowInsufficientMargin] = useState(false);
@@ -88,7 +90,7 @@ export default function OrderTypeSheet({
 
   const isLong = side === "Long";
   const sideColor = isLong ? "#25a764" : "#e54040";
-  const buttonLabel = isLong ? `Open Long ${assetTicker}` : `Open Short ${assetTicker}`;
+  const buttonLabel = isLong ? `${t("openLong")} ${assetTicker}` : `${t("openShort")} ${assetTicker}`;
 
   // Parse entry price (European format "70.488,5" → 70488.5)
   const entryPrice = parseFloat(price.replace(/\./g, "").replace(",", ".")) || 0;
@@ -166,7 +168,7 @@ export default function OrderTypeSheet({
         {/* Amount Display */}
         <div className="flex flex-col items-center justify-center py-[32px] gap-[12px] w-full">
           <p className="font-['Inter',sans-serif] font-normal text-[12px] leading-[16px] text-[#626363]">
-            Investment Margin
+            {t("investmentMargin")}
           </p>
           <p
             className="text-[36px] leading-[44px] text-[#020203] whitespace-nowrap"
@@ -176,7 +178,7 @@ export default function OrderTypeSheet({
             <span> {amount}</span>
           </p>
           <p className="font-['Inter',sans-serif] font-normal text-[12px] leading-[16px] text-[#626363]">
-            Pos. Size ~ USDT {formatPosSizeDisplay(positionSize)}
+            {t("positionSize")} {formatPosSizeDisplay(positionSize)}
           </p>
         </div>
 
@@ -186,7 +188,7 @@ export default function OrderTypeSheet({
           <div className="bg-[#fafafa] rounded-[10px] px-[12px] flex flex-col w-full">
             <div className="flex items-center justify-between h-[40px]">
               <span className="font-['Inter',sans-serif] text-[12px] leading-[16px] text-[#020203]">
-                Leverage
+                {t("leverage")}
               </span>
               <button
                 onClick={() => onOpenLeverage?.(leverage, margin, entryPrice)}
@@ -205,7 +207,7 @@ export default function OrderTypeSheet({
           {/* Available Balance */}
           <div className="bg-[#fafafa] rounded-[10px] px-[12px] py-[12px] flex items-center justify-between w-full">
             <span className="font-['Inter',sans-serif] text-[12px] leading-[16px] text-[#020203]">
-              Available Balance
+              {t("availableBalance")}
             </span>
             <div className="flex items-center gap-[4px]">
               <span className="font-['Inter',sans-serif] font-semibold text-[12px] leading-[16px] text-[#020203]">

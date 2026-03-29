@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useLang } from "../LangContext";
 
 export type CoachmarkStep = 1 | 2 | 3;
 
@@ -10,24 +11,6 @@ interface CoachmarkOverlayProps {
   onNext: () => void;
   onDone: () => void;
 }
-
-const COACHMARK_DATA: Record<CoachmarkStep, { title: string; body: string; action: "Next" | "OK" }> = {
-  1: {
-    title: "Position monitoring",
-    body: "Track your unrealized P&L and manage your trade in real-time. Use the options to adjust your Stop Loss or Take Profit settings easily. Stay in control of your strategy.",
-    action: "Next",
-  },
-  2: {
-    title: "Track your floating profit/loss",
-    body: "See your ROI in real-time based on the difference between your entry price and the current market price, amplified by your leverage.",
-    action: "Next",
-  },
-  3: {
-    title: "Monitor your Liquidation Price",
-    body: "Add margin to keep your position safe.",
-    action: "OK",
-  },
-};
 
 // Arrow horizontal alignment for each step
 const ARROW_ALIGN: Record<CoachmarkStep, "center" | "left"> = {
@@ -60,6 +43,12 @@ export default function CoachmarkOverlay({
   onNext,
   onDone,
 }: CoachmarkOverlayProps) {
+  const { t } = useLang();
+  const COACHMARK_DATA: Record<CoachmarkStep, { title: string; body: string; action: "Next" | "OK" }> = {
+    1: { title: t("coachA1Title"), body: t("coachA1Body"), action: "Next" },
+    2: { title: t("coachA2Title"), body: t("coachA2Body"), action: "Next" },
+    3: { title: t("coachA3Title"), body: t("coachA3Body"), action: "OK" },
+  };
   const data = COACHMARK_DATA[step];
   const isLast = step === 3;
   const overlayRef = useRef<HTMLDivElement>(null);

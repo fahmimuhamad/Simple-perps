@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useLang } from "../LangContext";
 
 const MIN = 1;
 const MAX = 25;
@@ -32,6 +33,7 @@ export default function LeverageSheet({
   onConfirm,
   onClose,
 }: LeverageSheetProps) {
+  const { t } = useLang();
   const [leverage, setLeverage] = useState(initialLeverage);
   const [animating, setAnimating] = useState(false);
 
@@ -129,12 +131,10 @@ export default function LeverageSheet({
           className="text-[20px] leading-[24px] text-[#020203] w-full text-center"
           style={{ fontFamily: "'Neue Haas Grotesk Display Pro', sans-serif", fontWeight: 500 }}
         >
-          Leverage
+          {t("leverage")}
         </span>
         <span className="font-['Inter',sans-serif] text-[12px] leading-[16px] text-[#020203]">
-          Multiply the amount you&apos;re investing.
-          <br />
-          Higher leverage gives you higher return but with higher risk.
+          {t("leverageDescription")}
         </span>
       </div>
 
@@ -147,7 +147,7 @@ export default function LeverageSheet({
           className="flex-1 h-[44px] bg-[#f2f2f2] rounded-[8px] flex items-center justify-center hover:bg-[#e8e8e8] active:scale-95 transition-all"
         >
           <span className="font-['Inter',sans-serif] font-semibold text-[14px] leading-[20px] text-[#020203]">
-            Min
+            {t("min")}
           </span>
         </button>
 
@@ -172,7 +172,7 @@ export default function LeverageSheet({
           className="flex-1 h-[44px] bg-[#f2f2f2] rounded-[8px] flex items-center justify-center hover:bg-[#e8e8e8] active:scale-95 transition-all"
         >
           <span className="font-['Inter',sans-serif] font-semibold text-[14px] leading-[20px] text-[#020203]">
-            Max
+            {t("max")}
           </span>
         </button>
       </div>
@@ -253,7 +253,7 @@ export default function LeverageSheet({
         <div className="bg-[#fafafa] rounded-[10px] p-[12px] flex flex-col gap-[10px] w-full">
           <div className="flex items-center justify-between">
             <span className="font-['Inter',sans-serif] text-[12px] leading-[16px] text-[#8d8e8e]">
-              Investment
+              {t("investment")}
             </span>
             <span className="font-['Inter',sans-serif] text-[12px] leading-[16px] text-[#020203]">
               USDT {margin > 0 ? Math.round(margin).toLocaleString("en-US") : "—"}
@@ -261,7 +261,7 @@ export default function LeverageSheet({
           </div>
           <div className="flex items-center justify-between">
             <span className="font-['Inter',sans-serif] text-[12px] leading-[16px] text-[#8d8e8e]">
-              Leverage
+              {t("leverage")}
             </span>
             <span className="font-['Inter',sans-serif] text-[12px] leading-[16px] text-[#020203]">
               x {leverage}
@@ -282,7 +282,7 @@ export default function LeverageSheet({
         <div className="bg-[#fafafa] rounded-[10px] p-[12px] flex flex-col w-full">
           <div className="flex items-center justify-between">
             <span className="font-['Inter',sans-serif] text-[12px] leading-[16px] text-[#8d8e8e]">
-              Est. Liquidation Price
+              {t("estLiqPriceLeverage")}
             </span>
             <span className="font-['Inter',sans-serif] text-[12px] leading-[16px] text-[#020203]">
               {liqPrice > 0
@@ -299,7 +299,7 @@ export default function LeverageSheet({
         className="w-[calc(100%-32px)] h-[44px] bg-[#0a68f4] rounded-[8px] flex items-center justify-center hover:opacity-90 active:opacity-80 transition-opacity"
       >
         <span className="font-['Inter',sans-serif] font-semibold text-[14px] leading-[20px] text-white">
-          Confirm
+          {t("confirm")}
         </span>
       </button>
 

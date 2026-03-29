@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useLang } from "../LangContext";
 
 type Side = "Long" | "Short";
 type Mode = "PnL" | "Price";
@@ -69,6 +70,7 @@ export default function TpSlSheet({
   onConfirm,
   onClose,
 }: TpSlSheetProps) {
+  const { t } = useLang();
   const [mode, setMode] = useState<Mode>("Price");
   const [tpEnabled, setTpEnabled] = useState(initialTpEnabled);
   const [slEnabled, setSlEnabled] = useState(initialSlEnabled);
@@ -158,7 +160,7 @@ export default function TpSlSheet({
         className="text-[20px] leading-[24px] text-[#020203] text-center w-[calc(100%-32px)]"
         style={{ fontFamily: "'Neue Haas Grotesk Display Pro', sans-serif", fontWeight: 500 }}
       >
-        Take Profit/Stop Loss
+        {t("takeProfitStopLoss")}
       </span>
 
       {/* Segmented Control: Price | % PnL */}
@@ -186,7 +188,7 @@ export default function TpSlSheet({
         <div className="flex items-center gap-[6px]">
           <Checkbox checked={tpEnabled} onChange={() => setTpEnabled((v) => !v)} />
           <span className="text-[12px] leading-[16px] text-[#020203]" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}>
-            Take Profit Price (TP)
+            {t("takeProfitPrice")}
           </span>
         </div>
 
@@ -204,7 +206,7 @@ export default function TpSlSheet({
                 onChange={(e) =>
                   mode === "PnL" ? setTpPnlInput(e.target.value) : setTpPriceInput(e.target.value)
                 }
-                placeholder={mode === "PnL" ? "Enter PnL amount" : "Enter price"}
+                placeholder={mode === "PnL" ? t("enterPnlAmount") : t("enterPrice")}
                 className="flex-1 bg-transparent outline-none text-[12px] leading-[16px] text-[#020203] placeholder:text-[#8d8e8e] placeholder:font-normal"
                 style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}
               />
@@ -216,7 +218,7 @@ export default function TpSlSheet({
             {/* Estimated row */}
             <div className="flex items-center justify-between">
               <span className="text-[12px] leading-[16px] text-[#626363]" style={{ fontFamily: "'Inter', sans-serif" }}>
-                {mode === "PnL" ? "Estimated Price" : "Estimated Profit"}
+                {mode === "PnL" ? t("estimatedPrice") : t("estimatedProfit")}
               </span>
               <span
                 className="text-[12px] leading-[16px]"
@@ -238,7 +240,7 @@ export default function TpSlSheet({
         <div className="flex items-center gap-[6px]">
           <Checkbox checked={slEnabled} onChange={() => setSlEnabled((v) => !v)} />
           <span className="text-[12px] leading-[16px] text-[#020203]" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}>
-            Stop Loss Price (SL)
+            {t("stopLossPrice")}
           </span>
         </div>
 
@@ -256,7 +258,7 @@ export default function TpSlSheet({
                 onChange={(e) =>
                   mode === "PnL" ? setSlPnlInput(e.target.value) : setSlPriceInput(e.target.value)
                 }
-                placeholder={mode === "PnL" ? "Enter loss amount" : "Enter price"}
+                placeholder={mode === "PnL" ? t("enterLossAmount") : t("enterPrice")}
                 className="flex-1 bg-transparent outline-none text-[12px] leading-[16px] text-[#020203] placeholder:text-[#8d8e8e] placeholder:font-normal"
                 style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}
               />
@@ -268,7 +270,7 @@ export default function TpSlSheet({
             {/* Error */}
             {slBelowLiq && (
               <span className="text-[10px] leading-[14px] text-[#e54040]" style={{ fontFamily: "'Inter', sans-serif" }}>
-                Stop Loss Trigger Price must be higher than Liquidation Price
+                {t("slBelowLiqError")}
               </span>
             )}
 
@@ -276,7 +278,7 @@ export default function TpSlSheet({
             {!slBelowLiq && (
               <div className="flex items-center justify-between">
                 <span className="text-[12px] leading-[16px] text-[#626363]" style={{ fontFamily: "'Inter', sans-serif" }}>
-                  {mode === "PnL" ? "Estimated Price" : "Estimated Loss"}
+                  {mode === "PnL" ? t("estimatedPrice") : t("estimatedLoss")}
                 </span>
                 <span
                   className="text-[12px] leading-[16px]"
@@ -297,7 +299,7 @@ export default function TpSlSheet({
       {estLiqPrice > 0 && (
         <div className="flex items-center justify-between w-full px-[16px]">
           <span className="text-[12px] leading-[16px] text-[#626363]" style={{ fontFamily: "'Inter', sans-serif" }}>
-            Est. Liquidation Price
+            {t("estLiqPrice")}
           </span>
           <span className="text-[12px] leading-[16px] text-[#626363]" style={{ fontFamily: "'Inter', sans-serif" }}>
             {`USDT ${formatPrice(estLiqPrice)} (${entryPrice > 0 ? ((side === "Long" ? estLiqPrice - entryPrice : entryPrice - estLiqPrice) / entryPrice * 100).toFixed(1) : "0"}%)`}
@@ -313,7 +315,7 @@ export default function TpSlSheet({
         style={{ backgroundColor: "#0a68f4", opacity: slBelowLiq ? 0.4 : 1, cursor: slBelowLiq ? "not-allowed" : "pointer" }}
       >
         <span className="text-[14px] leading-[20px] text-white" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}>
-          Confirm
+          {t("confirm")}
         </span>
       </button>
 

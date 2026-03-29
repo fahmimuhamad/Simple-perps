@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useLang } from "../LangContext";
 
 type Tab = "add" | "remove";
 type Side = "Long" | "Short";
@@ -43,6 +44,7 @@ export default function AddRemoveMarginSheet({
   onConfirm,
   onClose,
 }: AddRemoveMarginSheetProps) {
+  const { t } = useLang();
   const [tab, setTab] = useState<Tab>("add");
   const [rawInput, setRawInput] = useState("");
   const [pct, setPct] = useState(0);
@@ -148,18 +150,18 @@ export default function AddRemoveMarginSheet({
       <div className="flex flex-col gap-[16px] items-center w-full">
         {/* Segmented control */}
         <div className="bg-[#f2f2f2] flex items-start p-[2px] rounded-[8px] w-[calc(100%-32px)]">
-          {(["add", "remove"] as Tab[]).map((t) => (
+          {(["add", "remove"] as Tab[]).map((tabOption) => (
             <button
-              key={t}
-              onClick={() => switchTab(t)}
+              key={tabOption}
+              onClick={() => switchTab(tabOption)}
               className="flex-1 h-[28px] rounded-[6px] flex items-center justify-center transition-colors"
-              style={{ background: tab === t ? "#ffffff" : "transparent" }}
+              style={{ background: tab === tabOption ? "#ffffff" : "transparent" }}
             >
               <span
                 className="font-['Inter',sans-serif] font-semibold text-[14px] leading-[20px]"
-                style={{ color: tab === t ? "#020203" : "#8d8e8e" }}
+                style={{ color: tab === tabOption ? "#020203" : "#8d8e8e" }}
               >
-                {t === "add" ? "Add Margin" : "Remove Margin"}
+                {tabOption === "add" ? t("addMargin") : t("removeMargin")}
               </span>
             </button>
           ))}
@@ -194,7 +196,7 @@ export default function AddRemoveMarginSheet({
             {/* Size row */}
             <div className="flex items-center justify-between w-full">
               <span className="font-['Inter',sans-serif] text-[14px] leading-[20px] text-[#020203]">
-                Size
+                {t("size")}
               </span>
               <span className="font-['Inter',sans-serif] text-[14px] leading-[20px] text-[#020203]">
                 {assetTicker}{" "}
@@ -208,7 +210,7 @@ export default function AddRemoveMarginSheet({
             {/* Locked Margin row */}
             <div className="flex items-center justify-between w-full">
               <span className="font-['Inter',sans-serif] text-[14px] leading-[20px] text-[#020203]">
-                Locked Margin
+                {t("lockedMargin")}
               </span>
               <span className="font-['Inter',sans-serif] text-[14px] leading-[20px] text-[#020203]">
                 USDT {margin.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -223,10 +225,10 @@ export default function AddRemoveMarginSheet({
               {/* Top labels */}
               <div className="absolute top-0 left-0 right-0 flex items-center justify-between">
                 <span className="font-['Inter',sans-serif] text-[10px] leading-[14px] text-[#8d8e8e]">
-                  {tab === "add" ? "Margin to Add (USDT)" : "Margin to Remove (USDT)"}
+                  {tab === "add" ? t("marginToAdd") : t("marginToRemove")}
                 </span>
                 <span className="font-['Inter',sans-serif] text-[10px] leading-[14px] text-[#8d8e8e]">
-                  {tab === "add" ? "Max Additional Margin:" : "Max Removable Margin:"}{" "}
+                  {tab === "add" ? t("maxAdditionalMargin") : t("maxRemovableMargin")}{" "}
                   <span className="font-semibold text-[#020203]">
                     USDT {maxAmount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
@@ -240,7 +242,7 @@ export default function AddRemoveMarginSheet({
                   inputMode="decimal"
                   value={rawInput}
                   onChange={(e) => handleInputChange(e.target.value)}
-                  placeholder={tab === "add" ? "Enter Margin to Add" : "Enter Margin to Remove"}
+                  placeholder={tab === "add" ? t("enterMarginToAdd") : t("enterMarginToRemove")}
                   className="flex-1 bg-transparent font-['Inter',sans-serif] font-semibold text-[12px] leading-[16px] text-[#020203] placeholder:text-[#8d8e8e] placeholder:font-normal outline-none"
                 />
                 <button
@@ -299,7 +301,7 @@ export default function AddRemoveMarginSheet({
           {/* Est. Liquidation Price card */}
           <div className="bg-[#fafafa] rounded-[10px] p-[12px] flex items-center w-[calc(100%-32px)]">
             <span className="font-['Inter',sans-serif] text-[14px] leading-[20px] text-[#8d8e8e] flex-1">
-              Est Liquidation Price
+              {t("estLiqPriceMargin")}
             </span>
             <div className="flex items-center gap-[4px]">
               <span className="font-['Inter',sans-serif] font-semibold text-[14px] leading-[20px] text-[#020203]">
@@ -330,7 +332,7 @@ export default function AddRemoveMarginSheet({
           style={{ opacity: inputAmount <= 0 ? 0.4 : 1, cursor: inputAmount <= 0 ? "not-allowed" : "pointer" }}
         >
           <span className="font-['Inter',sans-serif] font-semibold text-[14px] leading-[20px] text-white">
-            Confirm
+            {t("confirm")}
           </span>
         </button>
 

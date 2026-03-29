@@ -15,6 +15,7 @@ import TransferSheet from "./TransferSheet";
 import { useBinancePrice } from "../hooks/useBinancePrice";
 import { useBinanceKlines } from "../hooks/useBinanceKlines";
 import { useFundingRate, useLongShortRatio } from "../hooks/useBinanceFutures";
+import { useLang } from "../LangContext";
 
 type Side = "Long" | "Short";
 
@@ -138,6 +139,7 @@ interface InitialScreenProps {
 }
 
 export default function InitialScreen({ onNavigateHome, variant = "A", startWithPosition }: InitialScreenProps) {
+  const { t } = useLang();
   const [activeTimeframe, setActiveTimeframe] = useState("15m");
   const [chartType, setChartType] = useState<"line" | "candle">("line");
   const [openSheet, setOpenSheet] = useState<Side | null>(null);
@@ -330,7 +332,7 @@ export default function InitialScreen({ onNavigateHome, variant = "A", startWith
             </span>
           </div>
           <div className="flex flex-col gap-[4px] items-end">
-            <span className="font-['Inter',sans-serif] text-[10px] leading-[14px] text-[#8d8e8e] border-b border-dashed border-[#8d8e8e]">Funding / Countdown</span>
+            <span className="font-['Inter',sans-serif] text-[10px] leading-[14px] text-[#8d8e8e] border-b border-dashed border-[#8d8e8e]">{t("fundingCountdown")}</span>
             <span className="font-['Inter',sans-serif] text-[10px] leading-[14px] text-[#626363]">
               {funding
                 ? `${(funding.fundingRate * 100).toFixed(4)}% / ${countdown}`
@@ -388,7 +390,7 @@ export default function InitialScreen({ onNavigateHome, variant = "A", startWith
         {/* Pintu Users Positions */}
         {!position && (
         <div className="px-[16px] py-[8px] flex flex-col gap-[8px]">
-          <span className="font-['Inter',sans-serif] font-semibold text-[14px] leading-[20px] text-[#020203]">User Position Distribution</span>
+          <span className="font-['Inter',sans-serif] font-semibold text-[14px] leading-[20px] text-[#020203]">{t("userPositionDistribution")}</span>
           <div className="flex flex-col gap-[2px]">
             <div className="flex gap-[4px] w-full">
               <div
@@ -412,7 +414,7 @@ export default function InitialScreen({ onNavigateHome, variant = "A", startWith
               </div>
             </div>
           </div>
-          <span className="font-['Inter',sans-serif] text-[10px] leading-[14px] text-[#626363]">Based on current open positions by other Pintu users for this asset. This is not a financial advice.</span>
+          <span className="font-['Inter',sans-serif] text-[10px] leading-[14px] text-[#626363]">{t("positionDistributionDisclaimer")}</span>
         </div>
         )}
 
@@ -427,14 +429,14 @@ export default function InitialScreen({ onNavigateHome, variant = "A", startWith
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 10L10 2M10 2H4M10 2v6" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
               <span className="font-['Inter',sans-serif] font-semibold text-[14px] leading-[20px] text-white">Long</span>
             </div>
-            <span className="font-['Inter',sans-serif] text-[10px] leading-[14px] text-white text-center px-[8px]">Profit when price goes up</span>
+            <span className="font-['Inter',sans-serif] text-[10px] leading-[14px] text-white text-center px-[8px]">{t("profitWhenUp")}</span>
           </button>
           <button onClick={() => setOpenSheet("Short")} className="flex-1 h-[52px] bg-[#e54040] rounded-[8px] flex flex-col gap-[2px] items-center justify-center overflow-hidden hover:opacity-90 transition-opacity">
             <div className="flex items-center gap-[4px]">
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 2L10 10M10 10H4M10 10V4" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
               <span className="font-['Inter',sans-serif] font-semibold text-[14px] leading-[20px] text-white">Short</span>
             </div>
-            <span className="font-['Inter',sans-serif] text-[10px] leading-[14px] text-white text-center px-[8px]">Profit when price goes down</span>
+            <span className="font-['Inter',sans-serif] text-[10px] leading-[14px] text-white text-center px-[8px]">{t("profitWhenDown")}</span>
           </button>
         </div>
         )}
@@ -442,7 +444,7 @@ export default function InitialScreen({ onNavigateHome, variant = "A", startWith
         {/* Positions header */}
         <div className="px-[16px] py-[8px] flex items-center justify-between">
           <span className="font-['Inter',sans-serif] font-semibold text-[14px] leading-[20px] text-[#020203]">
-            Positions ({positionCount})
+            {t("positions")} ({positionCount})
           </span>
           <button className="w-[20px] h-[20px] flex items-center justify-center"><IconOrderList /></button>
         </div>
@@ -485,7 +487,7 @@ export default function InitialScreen({ onNavigateHome, variant = "A", startWith
         ) : (
           <div className="flex flex-col items-center justify-center gap-[8px] py-[32px]">
             <IconDocument />
-            <span className="font-['Inter',sans-serif] font-semibold text-[12px] leading-[16px] text-[#626363]">No Open Positions</span>
+            <span className="font-['Inter',sans-serif] font-semibold text-[12px] leading-[16px] text-[#626363]">{t("noOpenPositions")}</span>
           </div>
         )}
 
@@ -502,7 +504,7 @@ export default function InitialScreen({ onNavigateHome, variant = "A", startWith
                 <img alt="" className="absolute block max-w-none size-full" src={imgNavHome} />
               </div>
             </div>
-            <span className="font-['Inter',sans-serif] font-normal text-[10px] leading-[14px] text-center text-[#020203] whitespace-nowrap">Home</span>
+            <span className="font-['Inter',sans-serif] font-normal text-[10px] leading-[14px] text-center text-[#020203] whitespace-nowrap">{t("home")}</span>
           </button>
           {/* Market */}
           <button className="flex flex-col gap-[4px] items-center justify-center overflow-clip px-[16px] w-[58px]">
@@ -511,7 +513,7 @@ export default function InitialScreen({ onNavigateHome, variant = "A", startWith
                 <img alt="" className="absolute block max-w-none size-full" src={imgNavMarkets} />
               </div>
             </div>
-            <span className="font-['Inter',sans-serif] font-normal text-[10px] leading-[14px] text-center text-[#020203] whitespace-nowrap">Market</span>
+            <span className="font-['Inter',sans-serif] font-normal text-[10px] leading-[14px] text-center text-[#020203] whitespace-nowrap">{t("market")}</span>
           </button>
           {/* Trade */}
           <button className="flex flex-col gap-[4px] items-center justify-center overflow-clip px-[16px] w-[58px]">
@@ -520,7 +522,7 @@ export default function InitialScreen({ onNavigateHome, variant = "A", startWith
                 <img alt="" className="absolute block max-w-none size-full" src={imgNavTrade} />
               </div>
             </div>
-            <span className="font-['Inter',sans-serif] font-normal text-[10px] leading-[14px] text-center text-[#020203] whitespace-nowrap">Trade</span>
+            <span className="font-['Inter',sans-serif] font-normal text-[10px] leading-[14px] text-center text-[#020203] whitespace-nowrap">{t("trade")}</span>
           </button>
           {/* Futures (active) */}
           <button className="flex flex-col gap-[4px] items-center justify-center overflow-clip px-[16px] w-[58px]">
@@ -529,7 +531,7 @@ export default function InitialScreen({ onNavigateHome, variant = "A", startWith
                 <img alt="" className="absolute block max-w-none size-full" src={imgNavFutures} />
               </div>
             </div>
-            <span className="font-['Inter',sans-serif] font-semibold text-[10px] leading-[14px] text-center text-[#020203] whitespace-nowrap">Futures</span>
+            <span className="font-['Inter',sans-serif] font-semibold text-[10px] leading-[14px] text-center text-[#020203] whitespace-nowrap">{t("futures")}</span>
           </button>
           {/* Wallet */}
           <button className="flex flex-col gap-[4px] items-center justify-center overflow-clip px-[16px] w-[58px]">
@@ -538,7 +540,7 @@ export default function InitialScreen({ onNavigateHome, variant = "A", startWith
                 <img alt="" className="absolute block max-w-none size-full" src={imgNavWallet} />
               </div>
             </div>
-            <span className="font-['Inter',sans-serif] font-normal text-[10px] leading-[14px] text-center text-[#020203] whitespace-nowrap">Wallet</span>
+            <span className="font-['Inter',sans-serif] font-normal text-[10px] leading-[14px] text-center text-[#020203] whitespace-nowrap">{t("wallet")}</span>
           </button>
         </div>
         <div className="w-[134px] h-[5px] rounded-full bg-[#020203] my-[8px]" />

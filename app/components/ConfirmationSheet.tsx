@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useLang } from "../LangContext";
 
 type Side = "Long" | "Short";
 
@@ -38,6 +39,7 @@ export default function ConfirmationSheet({
   onConfirm,
   onClose,
 }: ConfirmationSheetProps) {
+  const { t } = useLang();
   const [dontShowAgain, setDontShowAgain] = useState(false);
 
   const isLong = side === "Long";
@@ -49,7 +51,7 @@ export default function ConfirmationSheet({
 
   const rows: { label: string; value: React.ReactNode }[] = [
     {
-      label: "Side",
+      label: t("side"),
       value: (
         <span className="font-['Inter',sans-serif] text-[14px] leading-[20px]" style={{ color: sideColor }}>
           {side}
@@ -61,19 +63,19 @@ export default function ConfirmationSheet({
       value: assetName,
     },
     {
-      label: "Price",
+      label: t("price"),
       value: `USDT ${price}`,
     },
     {
-      label: "Amount",
+      label: t("amount"),
       value: `USDT ${margin.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`,
     },
     {
-      label: "Leverage",
+      label: t("leverage"),
       value: `${leverage}x`,
     },
     {
-      label: "Est. Liquidation Price",
+      label: t("estLiqPriceShort"),
       value: liqPriceDisplay,
     },
   ];
@@ -86,7 +88,7 @@ export default function ConfirmationSheet({
           className="text-[20px] leading-[24px] text-[#020203] text-center w-full"
           style={{ fontFamily: "'Neue Haas Grotesk Display Pro', sans-serif", fontWeight: 700 }}
         >
-          Order Confirmation
+          {t("orderConfirmation")}
         </span>
       </div>
 
@@ -128,7 +130,7 @@ export default function ConfirmationSheet({
           )}
         </button>
         <span className="font-['Inter',sans-serif] text-[12px] leading-[16px] text-black">
-          Don't show this confirmation page again. This can be configured later in Settings.
+          {t("dontShowAgain")}
         </span>
       </div>
 
@@ -139,7 +141,7 @@ export default function ConfirmationSheet({
           className="w-full h-[40px] bg-[#0a68f4] rounded-[8px] flex items-center justify-center hover:opacity-90 active:opacity-80 transition-opacity"
         >
           <span className="font-['Inter',sans-serif] font-semibold text-[14px] leading-[20px] text-white">
-            Confirm
+            {t("confirm")}
           </span>
         </button>
         <button
@@ -147,7 +149,7 @@ export default function ConfirmationSheet({
           className="w-full h-[40px] flex items-center justify-center hover:opacity-70 transition-opacity"
         >
           <span className="font-['Inter',sans-serif] font-semibold text-[14px] leading-[20px] text-[#0a68f4]">
-            Cancel
+            {t("cancel")}
           </span>
         </button>
       </div>

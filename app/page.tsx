@@ -5,6 +5,7 @@ import HomeScreen from "./components/HomeScreen";
 import InitialScreen from "./components/InitialScreen";
 import VariantSelectionScreen from "./components/VariantSelectionScreen";
 import OnboardingSheet from "./components/OnboardingSheet";
+import { LangProvider } from "./LangContext";
 
 type SelectVariant = "A" | "B" | "A-pos" | "B-pos";
 
@@ -44,6 +45,7 @@ export default function Home() {
   }
 
   return (
+    <LangProvider>
     <main className="bg-[#1a1a1a] flex items-center justify-center" style={{ minHeight: "100dvh" }}>
       <div className="relative w-full max-w-[390px] overflow-hidden shadow-2xl"
         style={{ height: "100dvh" }}>
@@ -65,5 +67,6 @@ export default function Home() {
         )}
       </div>
     </main>
+    </LangProvider>
   );
 }

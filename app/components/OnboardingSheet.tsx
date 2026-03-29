@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useLang } from "../LangContext";
 
 // Onboarding step images from Figma
 const imgStep1 = "https://www.figma.com/api/mcp/asset/dde0af1d-146a-4ea1-95b4-5f71ca422722";
@@ -11,43 +12,41 @@ interface OnboardingSheetProps {
   onDone: () => void;
 }
 
-const STEPS = [
-  {
-    image: imgStep1,
-    title: "What is Futures?",
-    body: (
-      <span>A contract to buy/sell at a future price. Trade price moves without owning the asset.</span>
-    ),
-    cta: "Next",
-  },
-  {
-    image: imgStep2,
-    title: "Going Long",
-    body: (
-      <span>
-        You &ldquo;<span style={{ color: "#25a764" }}>Long</span>&rdquo; when you think the price will go up. If it does, you make a profit!
-      </span>
-    ),
-    cta: "Next",
-  },
-  {
-    image: imgStep3,
-    title: "Going Short",
-    body: (
-      <span>
-        You &ldquo;<span style={{ color: "#e54040" }}>Short</span>&rdquo; when you think the price will go down. You profit even in a falling market.
-      </span>
-    ),
-    cta: "Trade on Pintu",
-  },
-];
-
 export default function OnboardingSheet({ onDone }: OnboardingSheetProps) {
+  const { t } = useLang();
   const [step, setStep] = useState(0);
   const [visible, setVisible] = useState(false);
-  // For cross-fade: track which step is "in" and which is "out"
   const [displayStep, setDisplayStep] = useState(0);
   const [fading, setFading] = useState(false);
+
+  const STEPS = [
+    {
+      image: imgStep1,
+      title: t("whatIsFutures"),
+      body: <span>{t("whatIsFuturesBody")}</span>,
+      cta: t("next"),
+    },
+    {
+      image: imgStep2,
+      title: t("goingLong"),
+      body: (
+        <span>
+          {t("goingLongBody").split('"Long"')[0]}&ldquo;<span style={{ color: "#25a764" }}>Long</span>&rdquo;{t("goingLongBody").split('"Long"')[1]}
+        </span>
+      ),
+      cta: t("next"),
+    },
+    {
+      image: imgStep3,
+      title: t("goingShort"),
+      body: (
+        <span>
+          {t("goingShortBody").split('"Short"')[0]}&ldquo;<span style={{ color: "#e54040" }}>Short</span>&rdquo;{t("goingShortBody").split('"Short"')[1]}
+        </span>
+      ),
+      cta: t("tradeOnPintu"),
+    },
+  ];
 
   // Slide up on mount
   useEffect(() => {

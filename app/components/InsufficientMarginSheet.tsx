@@ -1,5 +1,7 @@
 "use client";
 
+import { useLang } from "../LangContext";
+
 interface InsufficientMarginSheetProps {
   onTransfer: () => void;
   onBuyUsdt?: () => void;
@@ -7,6 +9,7 @@ interface InsufficientMarginSheetProps {
 }
 
 export default function InsufficientMarginSheet({ onTransfer, onBuyUsdt, onClose }: InsufficientMarginSheetProps) {
+  const { t } = useLang();
   return (
     <div className="absolute inset-0 z-20 flex flex-col items-center justify-end" style={{ backgroundColor: "rgba(0,0,0,0.7)" }} onClick={onClose}>
       {/* Drag indicator */}
@@ -27,7 +30,7 @@ export default function InsufficientMarginSheet({ onTransfer, onBuyUsdt, onClose
                 className="text-[#020203] text-[20px] leading-[24px] text-center w-full"
                 style={{ fontFamily: "'Neue Haas Grotesk Display Pro', sans-serif", fontWeight: 500 }}
               >
-                Insufficient Margin Balance
+                {t("insufficientMarginTitle")}
               </p>
             </div>
           </div>
@@ -38,21 +41,21 @@ export default function InsufficientMarginSheet({ onTransfer, onBuyUsdt, onClose
               className="text-[#020203] text-[14px] leading-[20px] w-full"
               style={{ fontFamily: "'Inter', sans-serif" }}
             >
-              To trade your desired amount, you can:
+              {t("insufficientMarginBody")}
             </p>
             <p
               className="text-[#020203] text-[14px] leading-[20px] w-full"
               style={{ fontFamily: "'Inter', sans-serif" }}
             >
-              1. Add more margin by transferring USDT to your Futures wallet.
-              <br />
-              2. Buy USDT from the Spot market, then transfer to your Futures wallet.
+              {t("insufficientMarginSteps").split("\n").map((line, i) => (
+                <span key={i}>{line}{i === 0 && <br />}</span>
+              ))}
             </p>
             <p
               className="text-[#020203] text-[14px] leading-[20px] w-full"
               style={{ fontFamily: "'Inter', sans-serif" }}
             >
-              You can still trade by using a smaller amount.
+              {t("insufficientMarginNote")}
             </p>
           </div>
 
@@ -67,7 +70,7 @@ export default function InsufficientMarginSheet({ onTransfer, onBuyUsdt, onClose
                 className="text-white text-[14px] leading-[20px] text-center"
                 style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}
               >
-                Transfer USDT to Future Wallet
+                {t("transferToFutures")}
               </span>
             </button>
             <button
@@ -78,7 +81,7 @@ export default function InsufficientMarginSheet({ onTransfer, onBuyUsdt, onClose
                 className="text-[14px] leading-[20px] text-center"
                 style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600, color: "#0a68f4" }}
               >
-                Buy USDT
+                {t("buyUsdt")}
               </span>
             </button>
           </div>

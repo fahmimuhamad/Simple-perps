@@ -1,5 +1,7 @@
 "use client";
 
+import { useLang } from "../LangContext";
+
 const imgRectangle328 = "https://www.figma.com/api/mcp/asset/01c55705-1a69-45e5-92e3-3bf837317cfd";
 const imgRectangle329 = "https://www.figma.com/api/mcp/asset/fabc7582-5c22-4a9e-8b63-5cc1fc54e57b";
 const imgGroup = "https://www.figma.com/api/mcp/asset/3482ad3f-2bd5-4905-8e39-40745f491338";
@@ -14,6 +16,7 @@ interface TransferSuccessScreenProps {
 }
 
 export default function TransferSuccessScreen({ usdtAmount, onOk, onTrade }: TransferSuccessScreenProps) {
+  const { t } = useLang();
   const usdtFormatted = usdtAmount.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
 
   return (
@@ -66,7 +69,7 @@ export default function TransferSuccessScreen({ usdtAmount, onOk, onTrade }: Tra
               className="text-white text-[20px] leading-[24px] text-center w-full mt-0"
               style={{ fontFamily: "'Neue Haas Grotesk Display Pro', sans-serif", fontWeight: 500 }}
             >
-              Transferring USDT {usdtFormatted}
+              {t("transferring")} {usdtFormatted}
             </p>
           </div>
         </div>
@@ -74,10 +77,10 @@ export default function TransferSuccessScreen({ usdtAmount, onOk, onTrade }: Tra
         {/* Detail rows */}
         <div className="flex flex-col gap-[25px] px-[16px] mt-[56px]">
           {[
-            { label: "From",           value: "Pintu Spot",    bold: true },
-            { label: "To",             value: "Pintu Futures", bold: true },
+            { label: "From",           value: t("pintuSpot"),    bold: true },
+            { label: "To",             value: t("pintuFutures"), bold: true },
             { label: "Amount",         value: `USDT ${usdtFormatted}`, bold: false },
-            { label: "Blockchain Fee", value: "Free",          bold: false },
+            { label: t("blockchainFee"), value: t("free"),          bold: false },
           ].map(({ label, value, bold }) => (
             <div key={label} className="flex items-start w-[343px]" style={{ gap: 64 }}>
               <span
@@ -106,7 +109,7 @@ export default function TransferSuccessScreen({ usdtAmount, onOk, onTrade }: Tra
             style={{ backgroundColor: "#0a68f4" }}
           >
             <span className="text-white text-[14px] leading-[20px] text-center"
-              style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}>OK</span>
+              style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}>{t("ok")}</span>
           </button>
           <button
             onClick={onTrade}
@@ -114,7 +117,7 @@ export default function TransferSuccessScreen({ usdtAmount, onOk, onTrade }: Tra
           >
             <span className="text-[14px] leading-[20px] text-center"
               style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600, color: "#0a68f4" }}>
-              View History
+              {t("viewHistory")}
             </span>
           </button>
         </div>

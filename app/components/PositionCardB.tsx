@@ -3,6 +3,8 @@
 // Asset URLs from Figma
 const imgUnion = "https://www.figma.com/api/mcp/asset/d2e15b2c-cb20-4812-a6c2-a7827c08897d";
 
+import { useLang } from "../LangContext";
+
 type Side = "Long" | "Short";
 
 interface PositionCardBProps {
@@ -39,6 +41,7 @@ export default function PositionCardB({
   onEditTpSl,
   onClosePosition,
 }: PositionCardBProps) {
+  const { t } = useLang();
   const isLong = side === "Long";
   const sideColor = isLong ? "#25a764" : "#e54040";
   const sideBg = isLong ? "#e6f4ea" : "#fde8e8";
@@ -117,7 +120,7 @@ export default function PositionCardB({
         <div className="flex gap-[16px] items-start w-full">
           <div className="bg-[#fafafa] flex-1 flex flex-col gap-[2px] items-start p-[8px] rounded-[8px]">
             <span className="font-['Inter',sans-serif] text-[10px] leading-[14px] text-[#626363]">
-              Position Size (USDT)
+              {t("positionSizeUsdt")}
             </span>
             <span className="font-['Inter',sans-serif] font-semibold text-[16px] leading-[22px] text-[#020203]">
               {formatEuropean(positionSize)}
@@ -126,7 +129,7 @@ export default function PositionCardB({
           <div className="bg-[#fafafa] flex-1 flex flex-col gap-[2px] items-end p-[8px] rounded-[8px]">
             <div className="flex items-center gap-[2px]">
               <span className="font-['Inter',sans-serif] text-[10px] leading-[14px] text-[#626363]">
-                Margin (USDT)
+                {t("marginUsdt")}
               </span>
               <button className="w-[12px] h-[12px] flex items-center justify-center" onClick={onAdjustMargin}>
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
@@ -171,12 +174,12 @@ export default function PositionCardB({
             className="border border-[rgba(2,2,3,0.1)] rounded-[4px] h-[44px] px-[16px] flex items-center justify-center hover:bg-[#f2f2f2] transition-colors whitespace-nowrap shrink-0"
           >
             <span className="font-['Inter',sans-serif] font-semibold text-[14px] leading-[20px] text-[#020203]">
-              Adjust Position
+              {t("adjustPosition")}
             </span>
           </button>
           <button className="border border-[rgba(2,2,3,0.1)] rounded-[4px] h-[44px] flex-1 flex items-center justify-center hover:bg-[#f2f2f2] transition-colors" onClick={onClosePosition}>
             <span className="font-['Inter',sans-serif] font-semibold text-[14px] leading-[20px] text-[#020203]">
-              Close Position
+              {t("closePosition")}
             </span>
           </button>
         </div>

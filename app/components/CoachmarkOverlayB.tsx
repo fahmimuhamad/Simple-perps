@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useLang } from "../LangContext";
 
 export type CoachmarkStepB = 1 | 2;
 
@@ -11,18 +12,7 @@ interface CoachmarkOverlayBProps {
   onDone: () => void;
 }
 
-const COACHMARK_DATA: Record<CoachmarkStepB, { title: string; body: string; action: "Next" | "OK" }> = {
-  1: {
-    title: "This Is Your Position",
-    body: "Monitor your unrealized P&L here and easily adjust your TP/SL settings anytime.",
-    action: "Next",
-  },
-  2: {
-    title: "Track Your Floating P&L",
-    body: "See your ROI in real-time based on the difference between your entry price and the current market price, amplified by your leverage.",
-    action: "OK",
-  },
-};
+// Module-level data removed; defined inside component for i18n
 
 const COACHMARK_TARGETS: Record<CoachmarkStepB, string> = {
   1: "position-card",
@@ -45,6 +35,11 @@ export default function CoachmarkOverlayB({
   onNext,
   onDone,
 }: CoachmarkOverlayBProps) {
+  const { t } = useLang();
+  const COACHMARK_DATA: Record<CoachmarkStepB, { title: string; body: string; action: "Next" | "OK" }> = {
+    1: { title: t("coachB1Title"), body: t("coachB1Body"), action: "Next" },
+    2: { title: t("coachB2Title"), body: t("coachB2Body"), action: "OK" },
+  };
   const data = COACHMARK_DATA[step];
   const isLast = step === 2;
   const overlayRef = useRef<HTMLDivElement>(null);

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import TransferSuccessScreen from "./TransferSuccessScreen";
+import { useLang } from "../LangContext";
 
 const AVAILABLE = 300;
 const USDT_TO_IDR_RATE = 15382;
@@ -93,6 +94,7 @@ function UsdtIcon() {
 }
 
 export default function TransferSheet({ available = AVAILABLE, onConfirm, onClose }: TransferSheetProps) {
+  const { t } = useLang();
   const [amount, setAmount] = useState("0");
   const [showBanner, setShowBanner] = useState(true);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -147,7 +149,7 @@ export default function TransferSheet({ available = AVAILABLE, onConfirm, onClos
           </button>
           <div className="absolute left-1/2 -translate-x-1/2">
             <span className="text-[#020203] text-[14px] leading-[20px] whitespace-nowrap" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}>
-              Transfer Balance
+              {t("transferBalance")}
             </span>
           </div>
         </div>
@@ -157,7 +159,7 @@ export default function TransferSheet({ available = AVAILABLE, onConfirm, onClos
       {showBanner && (
         <div className="bg-[#e6f4ea] flex items-center justify-between px-[16px] py-[8px]">
           <span className="text-[#020203] text-[12px] leading-[16px] flex-1 mr-[12px]" style={{ fontFamily: "'Inter', sans-serif" }}>
-            Easily transfer balances between Pintu wallets for free.
+            {t("transferDescription")}
           </span>
           <button onClick={() => setShowBanner(false)} className="size-[20px] flex items-center justify-center shrink-0">
             <CloseIcon />
@@ -172,8 +174,8 @@ export default function TransferSheet({ available = AVAILABLE, onConfirm, onClos
           <div className="flex gap-[12px] items-center">
             <PintuSpotIcon />
             <div className="flex flex-col items-start">
-              <span className="text-[#8d8e8e] text-[12px] leading-[16px]" style={{ fontFamily: "'Inter', sans-serif" }}>From</span>
-              <span className="text-[#020203] text-[14px] leading-[20px]" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}>Pintu Spot</span>
+              <span className="text-[#8d8e8e] text-[12px] leading-[16px]" style={{ fontFamily: "'Inter', sans-serif" }}>{t("from")}</span>
+              <span className="text-[#020203] text-[14px] leading-[20px]" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}>{t("pintuSpot")}</span>
             </div>
           </div>
           <ChevronRightIcon />
@@ -192,7 +194,7 @@ export default function TransferSheet({ available = AVAILABLE, onConfirm, onClos
           <div className="flex gap-[12px] items-center">
             <FuturesIcon />
             <div className="flex flex-col items-start">
-              <span className="text-[#8d8e8e] text-[12px] leading-[16px]" style={{ fontFamily: "'Inter', sans-serif" }}>To</span>
+              <span className="text-[#8d8e8e] text-[12px] leading-[16px]" style={{ fontFamily: "'Inter', sans-serif" }}>{t("to")}</span>
               <span className="text-[#020203] text-[14px] leading-[20px]" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}>Futures</span>
             </div>
           </div>
@@ -228,7 +230,7 @@ export default function TransferSheet({ available = AVAILABLE, onConfirm, onClos
         {/* Available + Max */}
         <div className="flex items-center justify-between px-[16px]">
           <span className="text-[12px] leading-[16px] text-[#020203]" style={{ fontFamily: "'Inter', sans-serif" }}>
-            Available: <span style={{ fontWeight: 600 }}>USDT {available}</span>
+            {t("available")} <span style={{ fontWeight: 600 }}>USDT {available}</span>
           </span>
           <button onClick={handleMax}>
             <span className="text-[#0a68f4] text-[12px] leading-[16px]" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}>Max</span>
@@ -245,7 +247,7 @@ export default function TransferSheet({ available = AVAILABLE, onConfirm, onClos
           style={{ backgroundColor: "#0a68f4", opacity: canTransfer ? 1 : 0.4, cursor: canTransfer ? "pointer" : "not-allowed" }}
         >
           <span className="text-white text-[14px] leading-[20px] text-center" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}>
-            Transfer
+            {t("transfer")}
           </span>
         </button>
       </div>

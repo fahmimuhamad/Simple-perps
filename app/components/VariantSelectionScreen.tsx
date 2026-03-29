@@ -1,5 +1,7 @@
 "use client";
 
+import { useLang } from "../LangContext";
+
 type SelectVariant = "A" | "B" | "A-pos" | "B-pos";
 
 interface VariantSelectionScreenProps {
@@ -7,6 +9,8 @@ interface VariantSelectionScreenProps {
 }
 
 export default function VariantSelectionScreen({ onSelect }: VariantSelectionScreenProps) {
+  const { lang, setLang, t } = useLang();
+
   return (
     <div className="w-full h-full bg-white flex flex-col items-center justify-center px-[24px] gap-[32px]">
       {/* Logo / header */}
@@ -24,7 +28,7 @@ export default function VariantSelectionScreen({ onSelect }: VariantSelectionScr
           Pintu Futures
         </p>
         <p className="font-['Inter',sans-serif] text-[13px] leading-[18px] text-[#626363] text-center">
-          Choose a concept to test
+          {t("chooseConceptToTest")}
         </p>
       </div>
 
@@ -39,7 +43,7 @@ export default function VariantSelectionScreen({ onSelect }: VariantSelectionScr
             <span className="font-['Inter',sans-serif] font-semibold text-[13px] text-white leading-none">A</span>
           </div>
           <span className="font-['Inter',sans-serif] font-semibold text-[15px] leading-[22px] text-[#020203]">
-            Option A — Current Flow
+            {t("optionAFlow")}
           </span>
         </button>
 
@@ -52,7 +56,7 @@ export default function VariantSelectionScreen({ onSelect }: VariantSelectionScr
             <span className="font-['Inter',sans-serif] font-semibold text-[13px] text-white leading-none">A</span>
           </div>
           <span className="font-['Inter',sans-serif] font-semibold text-[15px] leading-[22px] text-[#0a68f4]">
-            Option A — Open Position
+            {t("optionAPos")}
           </span>
         </button>
 
@@ -65,7 +69,7 @@ export default function VariantSelectionScreen({ onSelect }: VariantSelectionScr
             <span className="font-['Inter',sans-serif] font-semibold text-[13px] text-white leading-none">B</span>
           </div>
           <span className="font-['Inter',sans-serif] font-semibold text-[15px] leading-[22px] text-[#020203]">
-            Option B — Simplified View
+            {t("optionBView")}
           </span>
         </button>
 
@@ -78,9 +82,28 @@ export default function VariantSelectionScreen({ onSelect }: VariantSelectionScr
             <span className="font-['Inter',sans-serif] font-semibold text-[13px] text-white leading-none">B</span>
           </div>
           <span className="font-['Inter',sans-serif] font-semibold text-[15px] leading-[22px] text-[#25a764]">
-            Option B — Open Position
+            {t("optionBPos")}
           </span>
         </button>
+      </div>
+
+      {/* Language toggle */}
+      <div className="bg-[#f2f2f2] flex items-center p-[2px] rounded-[8px]">
+        {(["en", "id"] as const).map((l) => (
+          <button
+            key={l}
+            onClick={() => setLang(l)}
+            className="w-[60px] h-[28px] rounded-[6px] flex items-center justify-center transition-colors"
+            style={{ backgroundColor: lang === l ? "#ffffff" : "transparent" }}
+          >
+            <span
+              className="text-[13px] leading-[18px]"
+              style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600, color: lang === l ? "#020203" : "#8d8e8e" }}
+            >
+              {l === "en" ? "EN" : "ID"}
+            </span>
+          </button>
+        ))}
       </div>
     </div>
   );
