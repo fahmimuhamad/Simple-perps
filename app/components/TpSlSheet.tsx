@@ -107,9 +107,17 @@ export default function TpSlSheet({
     return pnl > 0 ? pnlToPrice(-pnl, entryPrice, positionSize, side) : 0;
   })();
 
-  // Derived PnL from price inputs (for Price mode hint)
-  const tpEstProfit = tpTrigger > 0 ? priceToPnl(tpTrigger, entryPrice, positionSize, side) : 0;
-  const slEstLoss = slTrigger > 0 ? Math.abs(priceToPnl(slTrigger, entryPrice, positionSize, side)) : 0;
+  // Validate TP/SL direction: TP for Long must be > entry, Short must be < entry; SL is opposite
+  const tpValidDir = tpTrigger > 0 && entryPrice > 0
+    ? (side === "Long" ? tpTrigger > entryPrice : tpTrigger < entryPrice)
+    : false;
+  const slValidDir = slTrigger > 0 && entryPrice > 0
+    ? (side === "Long" ? slTrigger < entryPrice : slTrigger > entryPrice)
+    : false;
+
+  // Derived PnL from price inputs (for Price mode hint) — only when direction is valid
+  const tpEstProfit = tpValidDir ? priceToPnl(tpTrigger, entryPrice, positionSize, side) : 0;
+  const slEstLoss = slValidDir ? Math.abs(priceToPnl(slTrigger, entryPrice, positionSize, side)) : 0;
 
   // SL validation
   const slBelowLiq: boolean =
@@ -141,8 +149,12 @@ export default function TpSlSheet({
     setMode(next);
   }
 
+  const tpDirError = tpEnabled && mode === "Price" && tpTrigger > 0 && !tpValidDir;
+  const slDirError = slEnabled && mode === "Price" && slTrigger > 0 && !slValidDir;
+  const hasError = slBelowLiq || tpDirError || slDirError;
+
   function handleConfirm() {
-    if (slBelowLiq) return;
+    if (hasError) return;
     onConfirm(tpEnabled ? tpTrigger : 0, slEnabled ? slTrigger : 0);
     onClose();
   }
@@ -176,7 +188,7 @@ export default function TpSlSheet({
               className="text-[14px] leading-[20px] text-center"
               style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600, color: mode === m ? "#020203" : "#8d8e8e" }}
             >
-              {m === "PnL" ? "% PnL" : "Price"}
+              {m === "PnL" ? "PnL" : "Price"}
             </span>
           </button>
         ))}
@@ -188,7 +200,7 @@ export default function TpSlSheet({
         <div className="flex items-center gap-[6px]">
           <Checkbox checked={tpEnabled} onChange={() => setTpEnabled((v) => !v)} />
           <span className="text-[12px] leading-[16px] text-[#020203]" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}>
-            {t("takeProfitPrice")}
+            {mode === "PnL" ? t("profitAmount") : t("takeProfitPrice")}
           </span>
         </div>
 
@@ -197,7 +209,7 @@ export default function TpSlSheet({
           <>
             <div
               className="bg-white rounded-[6px] h-[32px] flex items-center px-[8px]"
-              style={{ border: inputBorder(false) }}
+              style={{ border: inputBorder(mode === "Price" && tpTrigger > 0 && !tpValidDir) }}
             >
               <input
                 type={(mode === "PnL" ? tpPnlInput : tpPriceInput) ? "number" : "text"}
@@ -215,21 +227,30 @@ export default function TpSlSheet({
               </span>
             </div>
 
-            {/* Estimated row */}
-            <div className="flex items-center justify-between">
-              <span className="text-[12px] leading-[16px] text-[#626363]" style={{ fontFamily: "'Inter', sans-serif" }}>
-                {mode === "PnL" ? t("estimatedPrice") : t("estimatedProfit")}
+            {/* TP direction error */}
+            {mode === "Price" && tpTrigger > 0 && !tpValidDir && (
+              <span className="text-[10px] leading-[14px] text-[#e54040]" style={{ fontFamily: "'Inter', sans-serif" }}>
+                {side === "Long" ? t("tpMustBeAboveEntry") : t("tpMustBeBelowEntry")}
               </span>
-              <span
-                className="text-[12px] leading-[16px]"
-                style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600, color: "#25a764" }}
-              >
-                {mode === "PnL"
-                  ? tpTrigger > 0 ? formatPrice(tpTrigger) : "—"
-                  : tpEstProfit > 0 ? `USDT ${tpEstProfit.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "—"
-                }
-              </span>
-            </div>
+            )}
+
+            {/* Estimated row — hide when direction error or no value */}
+            {!tpDirError && (tpTrigger > 0 || (mode === "PnL" && parseFloat(tpPnlInput) > 0)) && (
+              <div className="flex items-center justify-between">
+                <span className="text-[12px] leading-[16px] text-[#626363]" style={{ fontFamily: "'Inter', sans-serif" }}>
+                  {mode === "PnL" ? t("estimatedPrice") : t("estimatedProfit")}
+                </span>
+                <span
+                  className="text-[12px] leading-[16px]"
+                  style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600, color: "#25a764" }}
+                >
+                  {mode === "PnL"
+                    ? tpTrigger > 0 ? formatPrice(tpTrigger) : "—"
+                    : tpEstProfit > 0 ? `USDT ${tpEstProfit.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "—"
+                  }
+                </span>
+              </div>
+            )}
           </>
         )}
       </div>
@@ -240,7 +261,7 @@ export default function TpSlSheet({
         <div className="flex items-center gap-[6px]">
           <Checkbox checked={slEnabled} onChange={() => setSlEnabled((v) => !v)} />
           <span className="text-[12px] leading-[16px] text-[#020203]" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}>
-            {t("stopLossPrice")}
+            {mode === "PnL" ? t("lossAmount") : t("stopLossPrice")}
           </span>
         </div>
 
@@ -249,7 +270,7 @@ export default function TpSlSheet({
           <>
             <div
               className="bg-white rounded-[6px] h-[32px] flex items-center px-[8px]"
-              style={{ border: inputBorder(slBelowLiq) }}
+              style={{ border: inputBorder(slBelowLiq || slDirError) }}
             >
               <input
                 type={(mode === "PnL" ? slPnlInput : slPriceInput) ? "number" : "text"}
@@ -273,9 +294,14 @@ export default function TpSlSheet({
                 {t("slBelowLiqError")}
               </span>
             )}
+            {slDirError && !slBelowLiq && (
+              <span className="text-[10px] leading-[14px] text-[#e54040]" style={{ fontFamily: "'Inter', sans-serif" }}>
+                {side === "Long" ? t("slMustBeBelowEntry") : t("slMustBeAboveEntry")}
+              </span>
+            )}
 
             {/* Estimated row */}
-            {!slBelowLiq && (
+            {!slBelowLiq && !slDirError && (slTrigger > 0 || (mode === "PnL" && parseFloat(slPnlInput) > 0)) && (
               <div className="flex items-center justify-between">
                 <span className="text-[12px] leading-[16px] text-[#626363]" style={{ fontFamily: "'Inter', sans-serif" }}>
                   {mode === "PnL" ? t("estimatedPrice") : t("estimatedLoss")}
@@ -310,9 +336,9 @@ export default function TpSlSheet({
       {/* Confirm */}
       <button
         onClick={handleConfirm}
-        disabled={slBelowLiq}
+        disabled={hasError}
         className="w-[calc(100%-32px)] h-[44px] rounded-[8px] flex items-center justify-center transition-opacity"
-        style={{ backgroundColor: "#0a68f4", opacity: slBelowLiq ? 0.4 : 1, cursor: slBelowLiq ? "not-allowed" : "pointer" }}
+        style={{ backgroundColor: "#0a68f4", opacity: hasError ? 0.4 : 1, cursor: hasError ? "not-allowed" : "pointer" }}
       >
         <span className="text-[14px] leading-[20px] text-white" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}>
           {t("confirm")}

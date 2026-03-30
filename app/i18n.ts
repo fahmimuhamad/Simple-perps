@@ -45,6 +45,8 @@ export const translations = {
     takeProfitStopLoss: "Take Profit/Stop Loss",
     takeProfitPrice: "Take Profit Price (TP)",
     stopLossPrice: "Stop Loss Price (SL)",
+    profitAmount: "Profit Amount",
+    lossAmount: "Loss Amount",
     enterPnlAmount: "Enter PnL amount",
     enterLossAmount: "Enter loss amount",
     enterPrice: "Enter price",
@@ -52,6 +54,10 @@ export const translations = {
     estimatedProfit: "Estimated Profit",
     estimatedLoss: "Estimated Loss",
     slBelowLiqError: "Stop Loss Trigger Price must be higher than Liquidation Price",
+    tpMustBeAboveEntry: "Take Profit price must be above entry price for Long",
+    tpMustBeBelowEntry: "Take Profit price must be below entry price for Short",
+    slMustBeBelowEntry: "Stop Loss price must be below entry price for Long",
+    slMustBeAboveEntry: "Stop Loss price must be above entry price for Short",
     confirm: "Confirm",
 
     // ConfirmationSheet
@@ -110,7 +116,7 @@ export const translations = {
 
     // OnboardingSheet
     whatIsFutures: "What is Futures?",
-    whatIsFuturesBody: "A contract to buy/sell at a future price. Trade price moves without owning the asset.",
+    whatIsFuturesBody: "Speculate on crypto price movements with leverage, without owning the actual asset. Go Long or Short and profit in any market direction.",
     next: "Next",
     goingLong: "Going Long",
     goingLongBody: "You \"Long\" when you think the price will go up. If it does, you make a profit!",
@@ -177,6 +183,8 @@ export const translations = {
     takeProfitStopLoss: "Take Profit/Stop Loss",
     takeProfitPrice: "Harga Take Profit (TP)",
     stopLossPrice: "Harga Stop Loss (SL)",
+    profitAmount: "Jumlah Profit",
+    lossAmount: "Jumlah Loss",
     enterPnlAmount: "Masukkan jumlah PnL",
     enterLossAmount: "Masukkan jumlah kerugian",
     enterPrice: "Masukkan harga",
@@ -184,6 +192,10 @@ export const translations = {
     estimatedProfit: "Perkiraan Profit",
     estimatedLoss: "Perkiraan Kerugian",
     slBelowLiqError: "Harga Trigger Stop Loss harus lebih tinggi dari Harga Likuidasi",
+    tpMustBeAboveEntry: "Harga Take Profit harus di atas harga entry untuk Long",
+    tpMustBeBelowEntry: "Harga Take Profit harus di bawah harga entry untuk Short",
+    slMustBeBelowEntry: "Harga Stop Loss harus di bawah harga entry untuk Long",
+    slMustBeAboveEntry: "Harga Stop Loss harus di atas harga entry untuk Short",
     confirm: "Konfirmasi",
 
     // ConfirmationSheet
@@ -242,7 +254,7 @@ export const translations = {
 
     // OnboardingSheet
     whatIsFutures: "Apa itu Futures?",
-    whatIsFuturesBody: "Kontrak untuk membeli/menjual di harga masa depan. Trading pergerakan harga tanpa memiliki aset.",
+    whatIsFuturesBody: "Spekulasikan pergerakan harga kripto dengan leverage, tanpa perlu memiliki aset secara langsung. Long atau Short dan cuan di kondisi pasar apapun.",
     next: "Lanjut",
     goingLong: "Going Long",
     goingLongBody: "Kamu \"Long\" ketika kamu pikir harga akan naik. Jika benar, kamu mendapat profit!",
