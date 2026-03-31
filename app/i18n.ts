@@ -120,12 +120,12 @@ export const translations = {
 
     // OnboardingSheet
     whatIsFutures: "What is Futures?",
-    whatIsFuturesBody: "Trade price movements without owning the asset. Use leverage to amplify potential profit.",
+    whatIsFuturesBody: "Trade price movements of crypto assets Use leverage to amplify potential profit.",
     next: "Next",
     goingLong: "Going Long",
-    goingLongBody: "You \"Long\" when you think the price will go up. If it does, you make a profit!",
+    goingLongBody: "Open a “Long“ position if you expect an increase.",
     goingShort: "Going Short",
-    goingShortBody: "You \"Short\" when you think the price will go down. You profit even in a falling market.",
+    goingShortBody: "Open a “Short“ position if you expect a drop.",
     tradeOnPintu: "Trade on Pintu",
 
     // CoachmarkOverlay (A)
@@ -262,12 +262,12 @@ export const translations = {
 
     // OnboardingSheet
     whatIsFutures: "Apa itu Futures?",
-    whatIsFuturesBody: "Trading pergerakan harga tanpa memiliki aset. Gunakan leverage untuk meningkatkan potensi profit.",
+    whatIsFuturesBody: "Trading pergerakan harga aset crypto. Gunakan leverage untuk meningkatkan potensi profit.",
     next: "Lanjut",
     goingLong: "Going Long",
-    goingLongBody: "Kamu \"Long\" ketika kamu pikir harga akan naik. Jika benar, kamu mendapat profit!",
+    goingLongBody: "Buka posisi “Long” saat kamu memperkirakan harga naik.",
     goingShort: "Going Short",
-    goingShortBody: "Kamu \"Short\" ketika kamu pikir harga akan turun. Kamu tetap profit meski pasar turun.",
+    goingShortBody: "Buka posisi “Short” saat kamu memperkirakan harga turun.",
     tradeOnPintu: "Mulai Trading di Pintu",
 
     // CoachmarkOverlay (A)
