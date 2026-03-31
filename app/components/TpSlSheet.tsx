@@ -211,6 +211,9 @@ export default function TpSlSheet({
               className="bg-white rounded-[6px] h-[32px] flex items-center px-[8px]"
               style={{ border: inputBorder(mode === "Price" && tpTrigger > 0 && !tpValidDir) }}
             >
+              {mode === "PnL" && (
+                <span className="text-[12px] leading-[16px] text-[#25a764] mr-[4px] shrink-0" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}>+</span>
+              )}
               <input
                 type={(mode === "PnL" ? tpPnlInput : tpPriceInput) ? "number" : "text"}
                 inputMode="decimal"
@@ -272,6 +275,9 @@ export default function TpSlSheet({
               className="bg-white rounded-[6px] h-[32px] flex items-center px-[8px]"
               style={{ border: inputBorder(slBelowLiq || slDirError) }}
             >
+              {mode === "PnL" && (
+                <span className="text-[12px] leading-[16px] text-[#e54040] mr-[4px] shrink-0" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}>-</span>
+              )}
               <input
                 type={(mode === "PnL" ? slPnlInput : slPriceInput) ? "number" : "text"}
                 inputMode="decimal"
