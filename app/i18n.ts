@@ -120,7 +120,7 @@ export const translations = {
 
     // OnboardingSheet
     whatIsFutures: "What is Futures?",
-    whatIsFuturesBody: "Speculate on crypto price movements with leverage, without owning the actual asset. Go Long or Short and profit in any market direction.",
+    whatIsFuturesBody: "Trade price movements without owning the asset. Use leverage to amplify potential profit.",
     next: "Next",
     goingLong: "Going Long",
     goingLongBody: "You \"Long\" when you think the price will go up. If it does, you make a profit!",
@@ -262,7 +262,7 @@ export const translations = {
 
     // OnboardingSheet
     whatIsFutures: "Apa itu Futures?",
-    whatIsFuturesBody: "Spekulasikan pergerakan harga kripto dengan leverage, tanpa perlu memiliki aset secara langsung. Long atau Short dan cuan di kondisi pasar apapun.",
+    whatIsFuturesBody: "Trading pergerakan harga tanpa memiliki aset. Gunakan leverage untuk meningkatkan potensi profit.",
     next: "Lanjut",
     goingLong: "Going Long",
     goingLongBody: "Kamu \"Long\" ketika kamu pikir harga akan naik. Jika benar, kamu mendapat profit!",
