@@ -151,6 +151,7 @@ export default function InitialScreen({ onNavigateHome, variant = "A", startWith
   const [coachmarkStepB, setCoachmarkStepB] = useState<CoachmarkStepB | null>(null);
   const [hasSeenCoachmark, setHasSeenCoachmark] = useState(false);
   const [showTransferSheet, setShowTransferSheet] = useState(false);
+  const [showTradeSheet, setShowTradeSheet] = useState(false);
   const [currentMargin, setCurrentMargin] = useState("0");
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -421,22 +422,14 @@ export default function InitialScreen({ onNavigateHome, variant = "A", startWith
         {/* Divider */}
         <div className="h-px bg-[#f2f2f2] mx-[16px]" />
 
-        {/* Long / Short buttons */}
+        {/* Trade button */}
         {!position && (
-        <div className="px-[16px] py-[16px] flex gap-[16px]">
-          <button onClick={() => setOpenSheet("Long")} className="flex-1 h-[52px] bg-[#25a764] rounded-[8px] flex flex-col gap-[2px] items-center justify-center overflow-hidden hover:opacity-90 transition-opacity">
-            <div className="flex items-center gap-[4px]">
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 10L10 2M10 2H4M10 2v6" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
-              <span className="font-['Inter',sans-serif] font-semibold text-[14px] leading-[20px] text-white">Long</span>
-            </div>
-            <span className="font-['Inter',sans-serif] text-[10px] leading-[14px] text-white text-center px-[8px]">{t("profitWhenUp")}</span>
-          </button>
-          <button onClick={() => setOpenSheet("Short")} className="flex-1 h-[52px] bg-[#e54040] rounded-[8px] flex flex-col gap-[2px] items-center justify-center overflow-hidden hover:opacity-90 transition-opacity">
-            <div className="flex items-center gap-[4px]">
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 2L10 10M10 10H4M10 10V4" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
-              <span className="font-['Inter',sans-serif] font-semibold text-[14px] leading-[20px] text-white">Short</span>
-            </div>
-            <span className="font-['Inter',sans-serif] text-[10px] leading-[14px] text-white text-center px-[8px]">{t("profitWhenDown")}</span>
+        <div className="px-[16px] py-[16px]">
+          <button
+            onClick={() => setShowTradeSheet(true)}
+            className="w-full h-[52px] bg-[#0a68f4] rounded-[8px] flex items-center justify-center hover:opacity-90 transition-opacity"
+          >
+            <span className="font-['Inter',sans-serif] font-semibold text-[14px] leading-[20px] text-white">{t("openPosition")}</span>
           </button>
         </div>
         )}
@@ -557,6 +550,54 @@ export default function InitialScreen({ onNavigateHome, variant = "A", startWith
             }}
             onClose={() => setShowTransferSheet(false)}
           />
+        </div>
+      )}
+
+      {/* Trade Direction Sheet */}
+      {showTradeSheet && (
+        <div className="absolute inset-0 z-10">
+          <div className="absolute inset-0 bg-black/70" onClick={() => setShowTradeSheet(false)} />
+          <div className="absolute inset-0 flex items-end pointer-events-none">
+            <div className="pointer-events-auto w-full bg-white rounded-t-[16px] pt-[8px] pb-[32px] flex flex-col items-center gap-[16px]">
+              {/* Drag indicator */}
+              <div className="w-[40px] h-[4px] rounded-full bg-[#8d8e8e]" />
+              {/* Title */}
+              <span
+                className="text-[18px] leading-[24px] text-[#020203] w-[calc(100%-32px)]"
+                style={{ fontFamily: "'Neue Haas Grotesk Display Pro', sans-serif", fontWeight: 500 }}
+              >
+                {t("chooseDirection")}
+              </span>
+              {/* Long button */}
+              <button
+                onClick={() => { setShowTradeSheet(false); setOpenSheet("Long"); }}
+                className="w-[calc(100%-32px)] rounded-[12px] p-[16px] flex items-center gap-[12px] text-left hover:opacity-90 transition-opacity"
+                style={{ backgroundColor: "#e6f4ea" }}
+              >
+                <div className="w-[40px] h-[40px] rounded-full bg-[#25a764] flex items-center justify-center shrink-0">
+                  <svg width="18" height="18" viewBox="0 0 14 14" fill="none"><path d="M2 10L10 2M10 2H4M10 2v6" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                </div>
+                <div className="flex flex-col gap-[2px]">
+                  <span className="font-['Inter',sans-serif] font-semibold text-[15px] leading-[22px] text-[#25a764]">Prediksi harga naik (Long)</span>
+                  <span className="font-['Inter',sans-serif] text-[12px] leading-[16px] text-[#626363]">{t("longDescription")}</span>
+                </div>
+              </button>
+              {/* Short button */}
+              <button
+                onClick={() => { setShowTradeSheet(false); setOpenSheet("Short"); }}
+                className="w-[calc(100%-32px)] rounded-[12px] p-[16px] flex items-center gap-[12px] text-left hover:opacity-90 transition-opacity"
+                style={{ backgroundColor: "#fde8e8" }}
+              >
+                <div className="w-[40px] h-[40px] rounded-full bg-[#e54040] flex items-center justify-center shrink-0">
+                  <svg width="18" height="18" viewBox="0 0 14 14" fill="none"><path d="M2 2L10 10M10 10H4M10 10V4" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                </div>
+                <div className="flex flex-col gap-[2px]">
+                  <span className="font-['Inter',sans-serif] font-semibold text-[15px] leading-[22px] text-[#e54040]">Prediksi harga turun (Short)</span>
+                  <span className="font-['Inter',sans-serif] text-[12px] leading-[16px] text-[#626363]">{t("shortDescription")}</span>
+                </div>
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
