@@ -2,12 +2,12 @@
 
 import { useLang } from "../LangContext";
 
-const imgRectangle328 = "https://www.figma.com/api/mcp/asset/01c55705-1a69-45e5-92e3-3bf837317cfd";
-const imgRectangle329 = "https://www.figma.com/api/mcp/asset/fabc7582-5c22-4a9e-8b63-5cc1fc54e57b";
-const imgGroup = "https://www.figma.com/api/mcp/asset/3482ad3f-2bd5-4905-8e39-40745f491338";
-const imgEllipse261 = "https://www.figma.com/api/mcp/asset/7195cca0-3d20-44fa-a99f-08398d6ca770";
-const imgEllipse260 = "https://www.figma.com/api/mcp/asset/06e51076-b243-40e7-b0c2-7f7e226bbf61";
-const imgIcons24Switch = "https://www.figma.com/api/mcp/asset/05297446-982d-4457-aabc-758d58fd68d2";
+const imgRectangle328 = "/icons/transfer-success-bg1.png";
+const imgRectangle329 = "/icons/transfer-success-bg2.png";
+const imgGroup = "/icons/transfer-success-check.png";
+const imgEllipse261 = "/icons/transfer-success-ellipse1.png";
+const imgEllipse260 = "/icons/transfer-success-ellipse2.png";
+const imgIcons24Switch = "/icons/transfer-success-switch.png";
 
 interface TransferSuccessScreenProps {
   usdtAmount: number;
