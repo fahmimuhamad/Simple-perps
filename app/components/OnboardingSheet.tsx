@@ -13,7 +13,7 @@ interface OnboardingSheetProps {
 }
 
 export default function OnboardingSheet({ onDone }: OnboardingSheetProps) {
-  const { t } = useLang();
+  const { t, lang } = useLang();
   const [step, setStep] = useState(0);
   const [visible, setVisible] = useState(false);
   const [displayStep, setDisplayStep] = useState(0);
@@ -31,7 +31,9 @@ export default function OnboardingSheet({ onDone }: OnboardingSheetProps) {
       title: t("goingLong"),
       body: (
         <span>
-          {t("goingLongBody").split('"Long"')[0]}&ldquo;<span style={{ color: "#25a764" }}>Long</span>&rdquo;{t("goingLongBody").split('"Long"')[1]}
+          {lang === "id"
+            ? <>Buka posisi &ldquo;<span style={{ color: "#25a764" }}>Long</span>&rdquo; saat kamu memperkirakan harga naik.</>
+            : <>Open a &ldquo;<span style={{ color: "#25a764" }}>Long</span>&rdquo; position if you expect an increase.</>}
         </span>
       ),
       cta: t("next"),
@@ -41,7 +43,9 @@ export default function OnboardingSheet({ onDone }: OnboardingSheetProps) {
       title: t("goingShort"),
       body: (
         <span>
-          {t("goingShortBody").split('"Short"')[0]}&ldquo;<span style={{ color: "#e54040" }}>Short</span>&rdquo;{t("goingShortBody").split('"Short"')[1]}
+          {lang === "id"
+            ? <>Buka posisi &ldquo;<span style={{ color: "#e54040" }}>Short</span>&rdquo; saat kamu memperkirakan harga turun.</>
+            : <>Open a &ldquo;<span style={{ color: "#e54040" }}>Short</span>&rdquo; position if you expect a drop.</>}
         </span>
       ),
       cta: t("tradeOnPintu"),

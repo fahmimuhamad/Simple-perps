@@ -8,6 +8,8 @@ export const translations = {
     optionAPos: "Option A — Open Position",
     optionBView: "Option B — Simplified View",
     optionBPos: "Option B — Open Position",
+    optionCFlow: "Option C — Leverage Illustration",
+    optionCPos: "Option C — Open Position",
 
     // InitialScreen
     fundingCountdown: "Funding / Countdown",
@@ -123,9 +125,9 @@ export const translations = {
     whatIsFuturesBody: "Trade price movements of crypto assets Use leverage to amplify potential profit.",
     next: "Next",
     goingLong: "Going Long",
-    goingLongBody: "Open a “Long“ position if you expect an increase.",
+    goingLongBody: 'Open a “Long” position if you expect an increase.',
     goingShort: "Going Short",
-    goingShortBody: "Open a “Short“ position if you expect a drop.",
+    goingShortBody: 'Open a “Short” position if you expect a drop.',
     tradeOnPintu: "Trade on Pintu",
 
     // CoachmarkOverlay (A)
@@ -141,6 +143,14 @@ export const translations = {
     coachB1Body: "Monitor your unrealized P&L here and easily adjust your TP/SL settings anytime.",
     coachB2Title: "Track Your Floating P&L",
     coachB2Body: "See your ROI in real-time based on the difference between your entry price and the current market price, amplified by your leverage.",
+
+    // LeverageSheetC illustration
+    illustrationBadge: "Illustration",
+    illustrationTitle: "How leverage amplifies your profit",
+    priceScenario: "Price scenario",
+    spotLabel: "Spot 1x",
+    cantProfit: "Can't profit",
+    leverageMultiplierLabel: "potential profit vs Spot",
   },
 
   id: {
@@ -150,6 +160,8 @@ export const translations = {
     optionAPos: "Opsi A — Open Position",
     optionBView: "Opsi B — Tampilan Sederhana",
     optionBPos: "Opsi B — Open Position",
+    optionCFlow: "Opsi C — Ilustrasi Leverage",
+    optionCPos: "Opsi C — Open Position",
 
     // InitialScreen
     fundingCountdown: "Funding / Hitung Mundur",
@@ -265,9 +277,9 @@ export const translations = {
     whatIsFuturesBody: "Trading pergerakan harga aset crypto. Gunakan leverage untuk meningkatkan potensi profit.",
     next: "Lanjut",
     goingLong: "Going Long",
-    goingLongBody: "Buka posisi “Long” saat kamu memperkirakan harga naik.",
+    goingLongBody: 'Buka posisi “Long” saat kamu memperkirakan harga naik.',
     goingShort: "Going Short",
-    goingShortBody: "Buka posisi “Short” saat kamu memperkirakan harga turun.",
+    goingShortBody: 'Buka posisi “Short” saat kamu memperkirakan harga turun.',
     tradeOnPintu: "Mulai Trading di Pintu",
 
     // CoachmarkOverlay (A)
@@ -283,6 +295,14 @@ export const translations = {
     coachB1Body: "Pantau Unrealized P&L kamu di sini dan sesuaikan pengaturan TP/SL kapan saja.",
     coachB2Title: "Pantau Floating P&L",
     coachB2Body: "Lihat ROI kamu secara real-time berdasarkan selisih harga entry dan harga pasar saat ini, diperbesar oleh leverage kamu.",
+
+    // LeverageSheetC illustration
+    illustrationBadge: "Ilustrasi",
+    illustrationTitle: "Bagaimana leverage memperbesar profitmu",
+    priceScenario: "Skenario harga",
+    spotLabel: "Spot 1x",
+    cantProfit: "Tidak bisa profit",
+    leverageMultiplierLabel: "potensi profit vs Spot",
   },
 } satisfies Record<Lang, Record<string, string>>;
 
