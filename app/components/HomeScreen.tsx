@@ -6,13 +6,13 @@ import { useBinancePrice } from "../hooks/useBinancePrice";
 const USDT_TO_IDR = 15382;
 
 // ── Bottom Nav Icon assets (from Figma) ─────────────────────────────────────
-const imgNavHome    = "https://www.figma.com/api/mcp/asset/9c02c2e8-1ffe-47dc-b18d-d27412b070e5"; // Home Filled
-const imgNavMarkets = "https://www.figma.com/api/mcp/asset/eb922f9d-3367-4ff9-8214-29c82a2032cd";
-const imgNavTrade   = "https://www.figma.com/api/mcp/asset/b9f28d1e-b5eb-4c90-927e-5b99ddcbec96";
-const imgNavWallet  = "https://www.figma.com/api/mcp/asset/ffda615b-2a2c-43f6-911b-e7c09a2f7a45";
+const imgNavHome    = "/icons/home-nav-home.svg";
+const imgNavMarkets = "/icons/home-nav-markets.svg";
+const imgNavTrade   = "/icons/home-nav-trade.svg";
+const imgNavWallet  = "/icons/home-nav-wallet.svg";
 // Futures icon — CSS-drawn (document + pen)
-const imgNavFuturesCombined = "https://www.figma.com/api/mcp/asset/7fbd155d-3684-490e-be7c-331ef7731bc6";
-const imgNavFuturesVector   = "https://www.figma.com/api/mcp/asset/6ae7c423-a050-45d9-9ba6-b60d1190c9c2";
+const imgNavFuturesCombined = "/icons/home-nav-futures-combined.svg";
+const imgNavFuturesVector   = "/icons/home-nav-futures-vector.svg";
 
 function BtcIcon() {
   return (

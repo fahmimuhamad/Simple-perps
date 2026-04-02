@@ -10,6 +10,7 @@ import LiveChart from "./LiveChart";
 import AddRemoveMarginSheet from "./AddRemoveMarginSheet";
 import TpSlSheet from "./TpSlSheet";
 import LeverageSheet from "./LeverageSheet";
+import LeverageSheetC from "./LeverageSheetC";
 import ConfirmationSheet from "./ConfirmationSheet";
 import TransferSheet from "./TransferSheet";
 import { useBinancePrice } from "../hooks/useBinancePrice";
@@ -113,11 +114,6 @@ function IconWallet({ active }: { active?: boolean }) {
 }
 
 // ── Bottom Nav Icon assets (from Figma) ─────────────────────────────────────
-const imgNavHome    = "https://www.figma.com/api/mcp/asset/6e416875-ca78-4fd8-8283-dae81af72035";
-const imgNavMarkets = "https://www.figma.com/api/mcp/asset/feda7c4d-c058-419b-af41-6f1b7a99f5e7";
-const imgNavTrade   = "https://www.figma.com/api/mcp/asset/5d999868-aed7-462a-9cf7-794922086c8b";
-const imgNavFutures = "https://www.figma.com/api/mcp/asset/ab636837-5216-4107-853e-26441640c081";
-const imgNavWallet  = "https://www.figma.com/api/mcp/asset/c878f658-0ed4-460a-af6f-843e76fdbfea";
 
 const TIMEFRAMES = ["1m", "15m", "1H", "4H", "1D"];
 
@@ -134,7 +130,7 @@ interface OpenPosition {
 
 interface InitialScreenProps {
   onNavigateHome?: () => void;
-  variant?: "A" | "B";
+  variant?: "A" | "B" | "C";
   startWithPosition?: boolean;
 }
 
@@ -494,7 +490,7 @@ export default function InitialScreen({ onNavigateHome, variant = "A", startWith
           <button className="flex flex-col gap-[4px] items-center justify-center overflow-clip px-[16px] w-[58px]" onClick={onNavigateHome}>
             <div className="overflow-clip relative shrink-0 size-[24px]">
               <div className="absolute inset-[12.36%_12.5%_12.5%_12.5%]">
-                <img alt="" className="absolute block max-w-none size-full" src={imgNavHome} />
+                <img alt="" className="absolute block max-w-none size-full" src="/icons/nav-home.svg" />
               </div>
             </div>
             <span className="font-['Inter',sans-serif] font-normal text-[10px] leading-[14px] text-center text-[#020203] whitespace-nowrap">{t("home")}</span>
@@ -503,7 +499,7 @@ export default function InitialScreen({ onNavigateHome, variant = "A", startWith
           <button className="flex flex-col gap-[4px] items-center justify-center overflow-clip px-[16px] w-[58px]">
             <div className="overflow-clip relative shrink-0 size-[24px]">
               <div className="absolute inset-[8.33%]">
-                <img alt="" className="absolute block max-w-none size-full" src={imgNavMarkets} />
+                <img alt="" className="absolute block max-w-none size-full" src="/icons/nav-markets.svg" />
               </div>
             </div>
             <span className="font-['Inter',sans-serif] font-normal text-[10px] leading-[14px] text-center text-[#020203] whitespace-nowrap">{t("market")}</span>
@@ -512,7 +508,7 @@ export default function InitialScreen({ onNavigateHome, variant = "A", startWith
           <button className="flex flex-col gap-[4px] items-center justify-center overflow-clip px-[16px] w-[58px]">
             <div className="relative shrink-0 size-[24px]">
               <div className="absolute inset-[8.33%]">
-                <img alt="" className="absolute block max-w-none size-full" src={imgNavTrade} />
+                <img alt="" className="absolute block max-w-none size-full" src="/icons/nav-trade.svg" />
               </div>
             </div>
             <span className="font-['Inter',sans-serif] font-normal text-[10px] leading-[14px] text-center text-[#020203] whitespace-nowrap">{t("trade")}</span>
@@ -521,7 +517,7 @@ export default function InitialScreen({ onNavigateHome, variant = "A", startWith
           <button className="flex flex-col gap-[4px] items-center justify-center overflow-clip px-[16px] w-[58px]">
             <div className="overflow-clip relative shrink-0 size-[24px]">
               <div className="absolute inset-[12.5%]">
-                <img alt="" className="absolute block max-w-none size-full" src={imgNavFutures} />
+                <img alt="" className="absolute block max-w-none size-full" src="/icons/nav-futures.svg" />
               </div>
             </div>
             <span className="font-['Inter',sans-serif] font-semibold text-[10px] leading-[14px] text-center text-[#020203] whitespace-nowrap">{t("futures")}</span>
@@ -530,7 +526,7 @@ export default function InitialScreen({ onNavigateHome, variant = "A", startWith
           <button className="flex flex-col gap-[4px] items-center justify-center overflow-clip px-[16px] w-[58px]">
             <div className="overflow-clip relative shrink-0 size-[24px]">
               <div className="absolute inset-[12.5%]">
-                <img alt="" className="absolute block max-w-none size-full" src={imgNavWallet} />
+                <img alt="" className="absolute block max-w-none size-full" src="/icons/nav-wallet.svg" />
               </div>
             </div>
             <span className="font-['Inter',sans-serif] font-normal text-[10px] leading-[14px] text-center text-[#020203] whitespace-nowrap">{t("wallet")}</span>
@@ -732,13 +728,24 @@ export default function InitialScreen({ onNavigateHome, variant = "A", startWith
           <div className="absolute inset-0 bg-black/70" onClick={() => setShowLeverageSheet(false)} />
           <div className="absolute inset-0 flex items-end pointer-events-none">
             <div className="pointer-events-auto w-full">
-              <LeverageSheet
-                initialLeverage={Math.round(position.leverage)}
-                margin={position.margin}
-                entryPrice={position.entryPrice}
-                onConfirm={handleLeverageConfirm}
-                onClose={() => setShowLeverageSheet(false)}
-              />
+              {variant === "C" ? (
+                <LeverageSheetC
+                  initialLeverage={Math.round(position.leverage)}
+                  margin={position.margin}
+                  entryPrice={position.entryPrice}
+                  side={position.side}
+                  onConfirm={handleLeverageConfirm}
+                  onClose={() => setShowLeverageSheet(false)}
+                />
+              ) : (
+                <LeverageSheet
+                  initialLeverage={Math.round(position.leverage)}
+                  margin={position.margin}
+                  entryPrice={position.entryPrice}
+                  onConfirm={handleLeverageConfirm}
+                  onClose={() => setShowLeverageSheet(false)}
+                />
+              )}
             </div>
           </div>
         </div>
@@ -750,16 +757,30 @@ export default function InitialScreen({ onNavigateHome, variant = "A", startWith
           <div className="absolute inset-0 bg-black/70" onClick={() => setShowOrderLeverage(false)} />
           <div className="absolute inset-0 flex items-end pointer-events-none">
             <div className="pointer-events-auto w-full">
-              <LeverageSheet
-                initialLeverage={orderLeverageInit.leverage}
-                margin={orderLeverageInit.margin}
-                entryPrice={orderLeverageInit.entryPrice}
-                onConfirm={(lev) => {
-                  setOrderLeverage(lev);
-                  setShowOrderLeverage(false);
-                }}
-                onClose={() => setShowOrderLeverage(false)}
-              />
+              {variant === "C" ? (
+                <LeverageSheetC
+                  initialLeverage={orderLeverageInit.leverage}
+                  margin={orderLeverageInit.margin}
+                  entryPrice={orderLeverageInit.entryPrice}
+                  side={openSheet as "Long" | "Short"}
+                  onConfirm={(lev) => {
+                    setOrderLeverage(lev);
+                    setShowOrderLeverage(false);
+                  }}
+                  onClose={() => setShowOrderLeverage(false)}
+                />
+              ) : (
+                <LeverageSheet
+                  initialLeverage={orderLeverageInit.leverage}
+                  margin={orderLeverageInit.margin}
+                  entryPrice={orderLeverageInit.entryPrice}
+                  onConfirm={(lev) => {
+                    setOrderLeverage(lev);
+                    setShowOrderLeverage(false);
+                  }}
+                  onClose={() => setShowOrderLeverage(false)}
+                />
+              )}
             </div>
           </div>
         </div>
