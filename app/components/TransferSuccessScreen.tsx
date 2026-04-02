@@ -2,12 +2,12 @@
 
 import { useLang } from "../LangContext";
 
-const imgRectangle328 = "/icons/transfer-success-bg1.png";
-const imgRectangle329 = "/icons/transfer-success-bg2.png";
-const imgGroup = "/icons/transfer-success-check.png";
-const imgEllipse261 = "/icons/transfer-success-ellipse1.png";
-const imgEllipse260 = "/icons/transfer-success-ellipse2.png";
-const imgIcons24Switch = "/icons/transfer-success-switch.png";
+const imgRectangle328 = "/icons/transfer-success-bg1.svg";
+const imgRectangle329 = "/icons/transfer-success-bg2.svg";
+const imgGroup = "/icons/transfer-success-check.svg";
+const imgEllipse261 = "/icons/transfer-success-ellipse1.svg";
+const imgEllipse260 = "/icons/transfer-success-ellipse2.svg";
+const imgIcons24Switch = "/icons/transfer-success-switch.svg";
 
 interface TransferSuccessScreenProps {
   usdtAmount: number;
