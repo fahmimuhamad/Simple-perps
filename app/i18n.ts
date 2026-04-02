@@ -122,7 +122,7 @@ export const translations = {
 
     // OnboardingSheet
     whatIsFutures: "What is Futures?",
-    whatIsFuturesBody: "Trade price movements of crypto assets Use leverage to amplify potential profit.",
+    whatIsFuturesBody: "Trade the price movements of crypto assets. Get profit when prices rise or fall.",
     next: "Next",
     goingLong: "Going Long",
     goingLongBody: 'Open a “Long” position if you expect an increase.',
@@ -274,7 +274,7 @@ export const translations = {
 
     // OnboardingSheet
     whatIsFutures: "Apa itu Futures?",
-    whatIsFuturesBody: "Trading pergerakan harga aset crypto. Gunakan leverage untuk meningkatkan potensi profit.",
+    whatIsFuturesBody: "Trading pergerakan harga aset crypto. Dapatkan potensi keuntungan saat harga naik ataupun turun.",
     next: "Lanjut",
     goingLong: "Going Long",
     goingLongBody: 'Buka posisi “Long” saat kamu memperkirakan harga naik.',
