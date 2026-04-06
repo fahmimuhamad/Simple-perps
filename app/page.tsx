@@ -7,11 +7,11 @@ import VariantSelectionScreen from "./components/VariantSelectionScreen";
 import OnboardingSheet from "./components/OnboardingSheet";
 import { LangProvider } from "./LangContext";
 
-type SelectVariant = "A" | "B" | "A-pos" | "B-pos";
+type SelectVariant = "A" | "B" | "C" | "A-pos" | "B-pos" | "C-pos";
 
 export default function Home() {
   const [screen, setScreen] = useState<"select" | "home" | "futures">("select");
-  const [variant, setVariant] = useState<"A" | "B">("A");
+  const [variant, setVariant] = useState<"A" | "B" | "C">("A");
   const [withPosition, setWithPosition] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [onboardingDone, setOnboardingDone] = useState(false);
@@ -23,8 +23,11 @@ export default function Home() {
     } else if (v === "B-pos") {
       setVariant("B");
       setWithPosition(true);
+    } else if (v === "C-pos") {
+      setVariant("C");
+      setWithPosition(true);
     } else {
-      setVariant(v);
+      setVariant(v as "A" | "B" | "C");
       setWithPosition(false);
     }
     setScreen("home");
