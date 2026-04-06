@@ -2,7 +2,7 @@
 
 import { useLang } from "../LangContext";
 
-type SelectVariant = "A" | "B" | "A-pos" | "B-pos";
+type SelectVariant = "A" | "B" | "C" | "A-pos" | "B-pos" | "C-pos";
 
 interface VariantSelectionScreenProps {
   onSelect: (variant: SelectVariant) => void;
@@ -83,6 +83,32 @@ export default function VariantSelectionScreen({ onSelect }: VariantSelectionScr
           </div>
           <span className="font-['Inter',sans-serif] font-semibold text-[15px] leading-[22px] text-[#25a764]">
             {t("optionBPos")}
+          </span>
+        </button>
+
+        {/* Option C */}
+        <button
+          onClick={() => onSelect("C")}
+          className="w-full border border-[rgba(2,2,3,0.1)] rounded-[12px] p-[16px] flex items-center text-left hover:bg-[#fafafa] active:bg-[#f2f2f2] transition-colors gap-[8px]"
+        >
+          <div className="w-[28px] h-[28px] rounded-full bg-[#7c3aed] flex items-center justify-center shrink-0">
+            <span className="font-['Inter',sans-serif] font-semibold text-[13px] text-white leading-none">C</span>
+          </div>
+          <span className="font-['Inter',sans-serif] font-semibold text-[15px] leading-[22px] text-[#020203]">
+            {t("optionCFlow")}
+          </span>
+        </button>
+
+        {/* Option C with position */}
+        <button
+          onClick={() => onSelect("C-pos")}
+          className="w-full border border-[#7c3aed] rounded-[12px] p-[16px] flex items-center text-left hover:bg-[#f5f0ff] active:bg-[#ede0ff] transition-colors gap-[8px]"
+        >
+          <div className="w-[28px] h-[28px] rounded-full bg-[#7c3aed] flex items-center justify-center shrink-0">
+            <span className="font-['Inter',sans-serif] font-semibold text-[13px] text-white leading-none">C</span>
+          </div>
+          <span className="font-['Inter',sans-serif] font-semibold text-[15px] leading-[22px] text-[#7c3aed]">
+            {t("optionCPos")}
           </span>
         </button>
       </div>

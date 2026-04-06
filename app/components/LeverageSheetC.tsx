@@ -10,9 +10,6 @@ const TICK_W = 8;
 const TICK_GAP = 28;
 const TICK_STEP = TICK_W + TICK_GAP;
 
-const PROFIT_SCENARIOS = [5, 10, 20] as const;
-type ProfitScenario = typeof PROFIT_SCENARIOS[number];
-
 interface LeverageSheetCProps {
   initialLeverage?: number;
   margin?: number;
@@ -39,8 +36,8 @@ export default function LeverageSheetC({
   const { t, lang } = useLang();
   const [leverage, setLeverage] = useState(initialLeverage);
   const [animating, setAnimating] = useState(false);
-  const [activeScenario, setActiveScenario] = useState<ProfitScenario>(10);
   const [liqTooltipOpen, setLiqTooltipOpen] = useState(false);
+  const [illustrationSheetOpen, setIllustrationSheetOpen] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef(false);
@@ -94,21 +91,21 @@ export default function LeverageSheetC({
   }, []);
 
   const liqPrice = leverage >= 2 && entryPrice > 0 ? entryPrice * (1 - 1 / leverage) : 0;
+  const liqPct = liqPrice > 0 && entryPrice > 0
+    ? (((liqPrice - entryPrice) / entryPrice) * 100).toFixed(1)
+    : null;
+  const positionSize = margin * leverage;
   const offset = tickOffset(leverage);
-
-  const investAmount = margin > 0 ? margin : 100;
-  const spotPnl = investAmount * (activeScenario / 100);
-  const futuresPnl = investAmount * leverage * (activeScenario / 100);
-  const futuresRoi = activeScenario * leverage;
+  const maxAdverseMove = Math.min(100, Math.round((1 / leverage) * 100));
 
   return (
-    <div className="bg-white w-full rounded-t-[16px] pt-[12px] pb-0 flex flex-col items-center gap-[24px]">
+    <div className="bg-white w-full rounded-t-[8px] pt-[12px] pb-0 flex flex-col items-center gap-[24px] relative">
 
       {/* Drag handle */}
       <div className="bg-[#d0d0d0] h-[4px] rounded-full w-[36px]" />
 
       {/* Title + description */}
-      <div className="flex flex-col gap-[6px] items-center px-[24px] w-full text-center">
+      <div className="flex flex-col gap-[8px] items-center px-[16px] w-full text-center">
         <span
           className="text-[20px] leading-[24px] text-[#020203] w-full text-center"
           style={{ fontFamily: "'Neue Haas Grotesk Display Pro', sans-serif", fontWeight: 500 }}
@@ -122,9 +119,9 @@ export default function LeverageSheetC({
         </span>
       </div>
 
-      {/* Leverage number + ruler — grouped with tight internal gap */}
+      {/* Leverage number + ruler */}
       <div className="flex flex-col gap-0 w-full">
-        <div className="flex items-center justify-between w-full px-[24px]">
+        <div className="flex items-center justify-between w-full px-[16px]">
           <button
             onClick={() => changeLeverage(MIN)}
             className="w-[56px] h-[36px] rounded-[8px] bg-[#f2f2f2] flex items-center justify-center active:bg-[#e4e4e4] transition-colors"
@@ -156,7 +153,7 @@ export default function LeverageSheetC({
         {/* Drag ruler */}
         <div
           ref={containerRef}
-          className="w-full px-[24px] relative overflow-hidden select-none"
+          className="w-full px-[16px] relative overflow-hidden select-none"
           style={{
             height: 72,
             cursor: dragging ? "grabbing" : "grab",
@@ -168,72 +165,98 @@ export default function LeverageSheetC({
           onPointerUp={onPointerUp}
           onPointerCancel={onPointerUp}
         >
-        <div
-          className="absolute bottom-0 left-0 flex items-end"
-          style={{
-            gap: TICK_GAP,
-            transition: dragging ? "none" : "transform 0.15s ease",
-            transform: `translateX(${offset}px)`,
-            willChange: "transform",
-          }}
-        >
-          {ALL_TICKS.map((tick) => {
-            const isSelected = tick === leverage;
-            return (
-              <div
-                key={tick}
-                className="flex flex-col items-center"
-                style={{ width: TICK_W, flexShrink: 0 }}
-                onClick={() => changeLeverage(tick)}
-              >
-                <span
-                  className="font-['Inter',sans-serif] text-[10px] leading-[12px]"
-                  style={{ color: isSelected ? "#0a68f4" : "#c0c0c0", visibility: isSelected ? "hidden" : "visible" }}
+          <div
+            className="absolute bottom-0 left-0 flex items-end"
+            style={{
+              gap: TICK_GAP,
+              transition: dragging ? "none" : "transform 0.15s ease",
+              transform: `translateX(${offset}px)`,
+              willChange: "transform",
+            }}
+          >
+            {ALL_TICKS.map((tick) => {
+              const isSelected = tick === leverage;
+              return (
+                <div
+                  key={tick}
+                  className="flex flex-col items-center"
+                  style={{ width: TICK_W, flexShrink: 0 }}
+                  onClick={() => changeLeverage(tick)}
                 >
-                  {tick}
-                </span>
-                <div style={{
-                  width: isSelected ? 3 : 1,
-                  height: isSelected ? 52 : 20,
-                  background: isSelected ? "#0a68f4" : "#d0d0d0",
-                  borderRadius: 2,
-                  transition: "height 0.12s ease",
-                  marginTop: 2,
-                }} />
-              </div>
-            );
-          })}
-        </div>
-      </div>
-      </div>
-
-      {/* Chips */}
-      <div className="flex gap-[8px] w-full px-[24px]">
-        <div className="flex-1 bg-[#f7f7f7] rounded-[12px] px-[14px] py-[12px] flex flex-col gap-[4px]">
-          <span className="font-['Inter',sans-serif] text-[11px] text-[#8d8e8e]">
-            {t("investmentMargin")}
-          </span>
-          <span className="font-['Inter',sans-serif] text-[13px] font-semibold text-[#020203]">
-            USDT {margin > 0 ? Math.round(margin).toLocaleString("en-US") : "—"}
-          </span>
-        </div>
-
-        <div className="flex-1 bg-[#f7f7f7] rounded-[12px] px-[14px] py-[12px] flex flex-col gap-[4px] relative">
-          <div className="flex items-center gap-[4px]">
-            <span className="font-['Inter',sans-serif] text-[11px] text-[#8d8e8e]">
-              {lang === "id" ? "Harga Likuidasi" : "Liq. Price"}
-            </span>
-            <button onClick={() => setLiqTooltipOpen((v) => !v)}>
-              <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
-                <circle cx="7" cy="7" r="6.5" stroke="#c0c0c0"/>
-                <line x1="7" y1="6" x2="7" y2="10" stroke="#c0c0c0" strokeWidth="1.5" strokeLinecap="round"/>
-                <circle cx="7" cy="4.5" r="0.75" fill="#c0c0c0"/>
-              </svg>
-            </button>
+                  <span
+                    className="font-['Inter',sans-serif] text-[10px] leading-[12px]"
+                    style={{ color: isSelected ? "#0a68f4" : "#c0c0c0", visibility: isSelected ? "hidden" : "visible" }}
+                  >
+                    {tick}
+                  </span>
+                  <div style={{
+                    width: isSelected ? 3 : 1,
+                    height: isSelected ? 52 : 20,
+                    background: isSelected ? "#0a68f4" : "#d0d0d0",
+                    borderRadius: 2,
+                    transition: "height 0.12s ease",
+                    marginTop: 2,
+                  }} />
+                </div>
+              );
+            })}
           </div>
-          <span className="font-['Inter',sans-serif] text-[13px] font-semibold text-[#020203]">
-            {liqPrice > 0 ? `USDT ${formatEuropean(liqPrice)}` : "—"}
-          </span>
+        </div>
+      </div>
+
+      {/* Info cards — same structure as LeverageSheet */}
+      <div className="flex flex-col gap-[8px] items-start w-full px-[16px]">
+
+        {/* Card 1: Investment + Leverage + Position Size */}
+        <div className="bg-[#fafafa] rounded-[10px] p-[12px] flex flex-col gap-[10px] w-full">
+          <div className="flex items-center justify-between">
+            <span className="font-['Inter',sans-serif] text-[12px] leading-[16px] text-[#8d8e8e]">
+              {t("investment")}
+            </span>
+            <span className="font-['Inter',sans-serif] text-[12px] leading-[16px] text-[#020203]">
+              USDT {margin > 0 ? Math.round(margin).toLocaleString("en-US") : "—"}
+            </span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="font-['Inter',sans-serif] text-[12px] leading-[16px] text-[#8d8e8e]">
+              {t("leverage")}
+            </span>
+            <span className="font-['Inter',sans-serif] text-[12px] leading-[16px] text-[#020203]">
+              x {leverage}
+            </span>
+          </div>
+          <div className="h-px bg-[rgba(2,2,3,0.1)] w-full" />
+          <div className="flex items-center justify-between">
+            <span className="font-['Inter',sans-serif] text-[12px] leading-[16px] text-[#8d8e8e]">
+              {t("positionSize")}
+            </span>
+            <span className="font-['Inter',sans-serif] text-[12px] leading-[16px] text-[#020203]">
+              USDT {positionSize > 0 ? Math.round(positionSize).toLocaleString("en-US") : "—"}
+            </span>
+          </div>
+        </div>
+
+        {/* Card 2: Est. Liquidation Price */}
+        <div className="bg-[#fafafa] rounded-[10px] p-[12px] flex flex-col w-full relative">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-[4px]">
+              <span className="font-['Inter',sans-serif] text-[12px] leading-[16px] text-[#8d8e8e]">
+                {t("estLiqPriceLeverage")}
+              </span>
+              <button onClick={() => setLiqTooltipOpen((v) => !v)}>
+                <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+                  <circle cx="7" cy="7" r="6.5" stroke="#c0c0c0"/>
+                  <line x1="7" y1="6" x2="7" y2="10" stroke="#c0c0c0" strokeWidth="1.5" strokeLinecap="round"/>
+                  <circle cx="7" cy="4.5" r="0.75" fill="#c0c0c0"/>
+                </svg>
+              </button>
+            </div>
+            <span className="font-['Inter',sans-serif] text-[12px] leading-[16px] text-[#020203]">
+              {liqPrice > 0
+                ? `USDT ${formatEuropean(liqPrice)} (${liqPct}%)`
+                : "—"}
+            </span>
+          </div>
           {liqTooltipOpen && (
             <div style={{
               position: "absolute",
@@ -266,112 +289,201 @@ export default function LeverageSheetC({
       {/* Divider */}
       <div className="w-full h-px bg-[rgba(2,2,3,0.06)]" />
 
-      {/* Illustration */}
-      <div className="flex flex-col gap-[16px] w-full px-[24px]">
-
-        <div className="flex items-center justify-between w-full">
-          <span className="font-['Inter',sans-serif] text-[13px] font-semibold text-[#020203]">
-            {lang === "id"
-              ? side === "Long" ? "Jika harga naik" : "Jika harga turun"
-              : side === "Long" ? "If price goes up" : "If price goes down"}
+      {/* Illustration entry point */}
+      <button
+        onClick={() => setIllustrationSheetOpen(true)}
+        className="flex items-center justify-between w-full px-[16px] active:opacity-60 transition-opacity"
+      >
+        <div className="flex flex-col gap-[2px] items-start text-left">
+          <span className="font-['Inter',sans-serif] text-[10px] font-semibold uppercase tracking-[0.6px] text-[#8d8e8e]">
+            {t("illustrationBadge")}
           </span>
-          <div className="flex items-center gap-[6px]">
-            {PROFIT_SCENARIOS.map((s) => (
-              <button
-                key={s}
-                onClick={() => setActiveScenario(s)}
-                className="px-[10px] h-[26px] rounded-full text-[11px] font-semibold font-['Inter',sans-serif] transition-colors"
-                style={{
-                  backgroundColor: activeScenario === s ? "#25a764" : "#f2f2f2",
-                  color: activeScenario === s ? "#fff" : "#626363",
-                }}
-              >
-                {side === "Long" ? "+" : "-"}{s}%
-              </button>
-            ))}
-          </div>
+          <span className="font-['Inter',sans-serif] text-[13px] font-semibold text-[#020203]">
+            {t("illustrationTitle")}
+          </span>
         </div>
-
-        <div className="flex flex-col gap-[16px]">
-          <div className="flex flex-col gap-[6px]">
-            <div className="flex items-center justify-between">
-              <span className="font-['Inter',sans-serif] text-[12px] text-[#8d8e8e]">Spot 1x</span>
-              <span className="font-['Inter',sans-serif] text-[12px] text-[#8d8e8e]">
-                {side === "Long"
-                  ? `+USDT ${Math.round(spotPnl).toLocaleString("en-US")} · +${activeScenario}%`
-                  : lang === "id" ? "Tidak bisa profit" : "Can't profit"}
-              </span>
-            </div>
-            <div className="w-full h-[8px] bg-[#f0f0f0] rounded-full overflow-hidden">
-              <div style={{
-                width: side === "Short" ? "0%" : leverage > 1 ? `${(1 / leverage) * 100}%` : "100%",
-                height: "100%",
-                backgroundColor: "#d0d0d0",
-                borderRadius: 999,
-                transition: "width 0.3s ease",
-              }} />
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-[6px]">
-            <div className="flex items-center justify-between">
-              <span className="font-['Inter',sans-serif] text-[12px] font-semibold text-[#25a764]">
-                Futures {leverage}x
-              </span>
-              <span className="font-['Inter',sans-serif] text-[12px] font-semibold text-[#25a764]">
-                +USDT {Math.round(futuresPnl).toLocaleString("en-US")} · +{futuresRoi}%
-              </span>
-            </div>
-            <div className="w-full h-[8px] bg-[#f0f0f0] rounded-full overflow-hidden">
-              <div style={{ width: "100%", height: "100%", backgroundColor: "#25a764", borderRadius: 999 }} />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-[#f3faf6] rounded-[14px] px-[16px] py-[14px] flex items-center justify-between">
-          <div className="flex flex-col gap-[2px]">
-            <span className="font-['Inter',sans-serif] text-[11px] text-[#25a764]">
-              {lang === "id"
-                ? side === "Long" ? `Profitmu jika harga naik +${activeScenario}%` : `Profitmu jika harga turun -${activeScenario}%`
-                : side === "Long" ? `Your profit if price +${activeScenario}%` : `Your profit if price -${activeScenario}%`}
-            </span>
-            <span style={{
-              fontFamily: "'Neue Haas Grotesk Display Pro', sans-serif",
-              fontWeight: 500,
-              fontSize: 24,
-              lineHeight: "30px",
-              color: "#25a764",
-              transition: "all 0.2s ease",
-            }}>
-              +USDT {Math.round(futuresPnl).toLocaleString("en-US")}
-            </span>
-          </div>
-          {leverage > 1 && (
-            <div className="flex flex-col items-center justify-center w-[56px] h-[56px] rounded-full bg-white border border-[#d4edd9]">
-              <span style={{ fontFamily: "'Neue Haas Grotesk Display Pro', sans-serif", fontWeight: 500, fontSize: 16, color: "#25a764" }}>
-                {leverage}×
-              </span>
-              <span className="font-['Inter',sans-serif] text-[9px] text-[#25a764] text-center leading-[12px]">
-                vs Spot
-              </span>
-            </div>
-          )}
-        </div>
-      </div>
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ flexShrink: 0, marginLeft: 8 }}>
+          <path d="M7.5 5L12.5 10L7.5 15" stroke="#c0c0c0" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </button>
 
       {/* Confirm button */}
-      <div className="w-full px-[24px]">
-        <button
-          onClick={() => { onConfirm(leverage); onClose(); }}
-          className="w-full h-[52px] bg-[#0a68f4] rounded-[14px] flex items-center justify-center hover:opacity-90 active:opacity-80 transition-opacity"
-        >
-          <span className="font-['Inter',sans-serif] font-semibold text-[15px] text-white">{t("confirm")}</span>
-        </button>
-      </div>
+      <button
+        onClick={() => { onConfirm(leverage); onClose(); }}
+        className="w-[calc(100%-32px)] h-[44px] bg-[#0a68f4] rounded-[8px] flex items-center justify-center hover:opacity-90 active:opacity-80 transition-opacity"
+      >
+        <span className="font-['Inter',sans-serif] font-semibold text-[14px] leading-[20px] text-white">{t("confirm")}</span>
+      </button>
 
       {/* Home indicator */}
-      <div className="flex items-end justify-center pb-[8px]">
+      <div className="w-[134px] flex items-end justify-center pb-2 safe-bottom">
         <div className="w-[134px] h-[5px] rounded-full bg-[#020203]" />
+      </div>
+
+      {/* ── Illustration sheet overlay ── */}
+      {/* Scrim — full viewport, but pointer-events only when open */}
+      <div
+        onClick={() => setIllustrationSheetOpen(false)}
+        style={{
+          position: "fixed",
+          inset: 0,
+          backgroundColor: "rgba(0,0,0,0.5)",
+          opacity: illustrationSheetOpen ? 1 : 0,
+          transition: "opacity 0.25s ease",
+          zIndex: 40,
+          pointerEvents: illustrationSheetOpen ? "auto" : "none",
+        }}
+      />
+
+      {/* Sheet panel — constrained to phone frame width, centered */}
+      <div
+        style={{
+          position: "fixed",
+          bottom: 0,
+          left: "50%",
+          transform: illustrationSheetOpen
+            ? "translateX(-50%) translateY(0)"
+            : "translateX(-50%) translateY(100%)",
+          width: "100%",
+          maxWidth: 390,
+          zIndex: 41,
+          backgroundColor: "#fff",
+          borderRadius: "8px 8px 0 0",
+          transition: "transform 0.3s cubic-bezier(0.32, 0.72, 0, 1)",
+          display: "flex",
+          flexDirection: "column",
+          maxHeight: "92dvh",
+          overflow: "hidden",
+        }}
+      >
+        {/* Scrollable content */}
+        <div
+          style={{
+            overflowY: "auto",
+            display: "flex",
+            flexDirection: "column",
+            gap: 24,
+            paddingTop: 12,
+          }}
+        >
+          {/* Drag handle */}
+          <div className="bg-[#d0d0d0] h-[4px] rounded-full w-[36px] self-center flex-shrink-0" />
+
+          {/* Header */}
+          <div className="flex flex-col gap-[4px] px-[24px]">
+            <span className="font-['Inter',sans-serif] text-[10px] font-semibold uppercase tracking-[0.6px] text-[#8d8e8e]">
+              {t("illustrationBadge")}
+            </span>
+            <span style={{ fontFamily: "'Neue Haas Grotesk Display Pro', sans-serif", fontWeight: 500, fontSize: 20, lineHeight: "24px", color: "#020203" }}>
+              {t("illustrationTitle")}
+            </span>
+          </div>
+
+          {/* ── Comparison bars — fixed +10% scenario, 4 levels ── */}
+          <div className="flex flex-col gap-[14px] px-[24px]">
+
+            <div className="flex items-baseline justify-between">
+              <span className="font-['Inter',sans-serif] text-[11px] text-[#8d8e8e]">
+                {lang === "id"
+                  ? side === "Long" ? "Jika harga naik +10%" : "Jika harga turun -10%"
+                  : side === "Long" ? "If price goes up +10%" : "If price goes down -10%"}
+              </span>
+              <span className="font-['Inter',sans-serif] text-[10px] text-[#c0c0c0]">ROI</span>
+            </div>
+
+            {(() => {
+              // Build the bar set: anchors 1x, 2x, 5x + user's leverage (deduplicated)
+              const ANCHOR_LEVS = [1, 2, 5];
+              const allLevs = [...new Set([...ANCHOR_LEVS, leverage])].sort((a, b) => a - b);
+              const maxLev = Math.max(...allLevs);
+
+              return allLevs.map((lev) => {
+                const isUser = lev === leverage;
+                const roi = lev * 10;
+                const barPct = (lev / maxLev) * 100;
+                const label = lev === 1
+                  ? (lang === "id" ? "Spot 1x" : "Spot 1x")
+                  : `Futures ${lev}x`;
+
+                return (
+                  <div key={lev} className="flex flex-col gap-[6px]">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-[6px]">
+                        <span
+                          className="font-['Inter',sans-serif] text-[12px]"
+                          style={{
+                            fontWeight: isUser ? 600 : 400,
+                            color: isUser ? "#25a764" : "#8d8e8e",
+                          }}
+                        >
+                          {label}
+                        </span>
+                        {isUser && (
+                          <span className="font-['Inter',sans-serif] text-[10px] text-white bg-[#25a764] px-[6px] py-[1px] rounded-full leading-[16px]">
+                            {lang === "id" ? "kamu" : "you"}
+                          </span>
+                        )}
+                      </div>
+                      <span
+                        className="font-['Inter',sans-serif] text-[12px]"
+                        style={{
+                          fontWeight: isUser ? 600 : 400,
+                          color: isUser ? "#25a764" : "#8d8e8e",
+                        }}
+                      >
+                        +{roi}%
+                      </span>
+                    </div>
+                    <div className="w-full h-[8px] bg-[#f0f0f0] rounded-full overflow-hidden">
+                      <div style={{
+                        width: `${barPct}%`,
+                        height: "100%",
+                        backgroundColor: isUser ? "#25a764" : "#d8d8d8",
+                        borderRadius: 999,
+                        transition: "width 0.35s ease",
+                      }} />
+                    </div>
+                  </div>
+                );
+              });
+            })()}
+
+          </div>
+
+          {/* ── Neutral mechanic callout ── */}
+          <div className="bg-[#f7f7f7] rounded-[14px] mx-[24px] px-[16px] py-[14px] flex items-start gap-[12px]">
+            <div className="flex-shrink-0 w-[36px] h-[36px] rounded-full bg-white flex items-center justify-center">
+              {/* Balance scale icon — neutral, not warning */}
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                <path d="M9 2v14M4 5l5-3 5 3M4 13l5 3 5-3M4 5l-2 4 2 4M14 5l2 4-2 4M4 9h10" stroke="#8d8e8e" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+            <span className="font-['Inter',sans-serif] text-[12px] leading-[18px] text-[#626363]">
+              {lang === "id"
+                ? `Leverage ${leverage}x memperbesar profit dan loss kamu ${leverage}× lebih besar dari Spot. Semakin tinggi leverage, semakin besar pengaruhnya.`
+                : `${leverage}x leverage multiplies both your profit and loss by ${leverage}×. The higher the leverage, the bigger the effect.`}
+            </span>
+          </div>
+
+          {/* ── Liquidation note — plain text, no bar, no color alarm ── */}
+          <div className="px-[24px] flex items-start gap-[8px]">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ flexShrink: 0, marginTop: 1 }}>
+              <circle cx="7" cy="7" r="6.5" stroke="#c0c0c0"/>
+              <line x1="7" y1="6" x2="7" y2="10" stroke="#c0c0c0" strokeWidth="1.5" strokeLinecap="round"/>
+              <circle cx="7" cy="4.5" r="0.75" fill="#c0c0c0"/>
+            </svg>
+            <span className="font-['Inter',sans-serif] text-[11px] leading-[16px] text-[#8d8e8e]">
+              {lang === "id"
+                ? `Dengan leverage ${leverage}x, posisimu akan ditutup otomatis jika harga bergerak lebih dari ${maxAdverseMove}% melawanmu.`
+                : `With ${leverage}x leverage, your position closes automatically if price moves more than ${maxAdverseMove}% against you.`}
+            </span>
+          </div>
+
+          {/* Home indicator */}
+          <div className="w-[134px] flex items-end justify-center pb-2 safe-bottom self-center">
+            <div className="w-[134px] h-[5px] rounded-full bg-[#020203]" />
+          </div>
+        </div>
       </div>
     </div>
   );
