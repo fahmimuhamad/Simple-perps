@@ -183,7 +183,7 @@ export const translations = {
 
     // OrderTypeSheet
     investmentMargin: "Margin Investasi",
-    positionSize: "Ukuran Pos. ~ USDT",
+    positionSize: "Jumlah Posisi",
     leverage: "Leverage",
     availableBalance: "Saldo Tersedia",
     openLong: "Open Long",
